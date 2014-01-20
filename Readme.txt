@@ -4,8 +4,8 @@ Donate link: http://www.smackcoders.com/donate.html
 Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, restore
 Requires at least: 3.4.0
 Tested up to: 3.8
-Stable tag: 1.0.0
-Version: 1.0.0
+Stable tag: 1.1.0
+Version: 1.1.0
 Author: smackcoders
 Author URI: http://profiles.wordpress.org/smackcoders/
 License: GPLv2 or later
@@ -50,11 +50,17 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 
 == Changelog ==
 
+= 1.1.0 =
+* Added: Comments import feature added for posts,pages and custom posts.
+
 = 1.0.0 =	
 * Initial release version. Tested and found works well without any issues.
 
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+* Upgrade to enjoy comment import feature.
 
 = 1.0.0 =	
 * Initial release of plugin. 

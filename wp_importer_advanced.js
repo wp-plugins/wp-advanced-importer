@@ -182,10 +182,11 @@ function showMessages(alerttype, msg) {
     document.getElementById('showMsg').innerHTML = msg;
     document.getElementById('showMsg').className += ' ' + alerttype;
     document.getElementById('showMsg').style.display = '';
+    jQuery("#showMsg").fadeOut(10000);
 }
 
 function showMapMessages(alerttype, msg) {
-    jQuery("#showMsg").addClass("maperror");
+//    jQuery("#showMsg").addClass("maperror");
     document.getElementById('showMsg').innerHTML = msg;
     document.getElementById('showMsg').className += ' ' + alerttype;
     document.getElementById('showMsg').style.display = '';
@@ -199,26 +200,20 @@ function import_xml() {
 	if(pagemapping == 'on'){
 		document.getElementById('for_pages').style.display = "";
 	}*/
-/*    return true;
-    var importer = document.getElementById('selectedImporter').value;
-    var header_count = document.getElementById('h2').value;*/
-/*    var array = new Array();
+/*    return true; */
+/*    var importer = document.getElementById('selectedImporter').value; // alert(importer);
+    var header_count = document.getElementById('csv_header_count').value; // alert(header_count);
+    var array = new Array();
     var val1, val2, val3, val4, val5, val6, val7, error_msg;
     val1 = val2 = val3 = val4 = val5 = val6 = val7 = post_status_msg = 'Off';
     for (var i = 0; i < header_count; i++) {
         var e = document.getElementById("mapping" + i);
         var value = e.options[e.selectedIndex].value;
         array[i] = value;
-    }
-    if (importer == 'post' || importer == 'page' || importer == 'custompost') {
-        var getSelectedIndex = document.getElementById('xml_importer_cat');
-        var SelectedIndex = getSelectedIndex.value;
+    } 
+    if (importer == 'post' || importer == 'page' || importer == 'custompost') { 
         var chk_status_in_xml;
         var post_status_msg;
-        chk_status_in_xml = document.getElementById('importallwithps').value;
-        if (chk_status_in_xml != 0)
-            post_status_msg = 'On';
-
         for (var j = 0; j < array.length; j++) {
             if (array[j] == 'post_title') {
                 val1 = 'On';
@@ -226,28 +221,21 @@ function import_xml() {
             if (array[j] == 'post_content') {
                 val2 = 'On';
             }
-            if (post_status_msg == 'Off') {
-                if (array[j] == 'post_status')
-                    post_status_msg = 'On';
-            }
-        }
-        if (val1 == 'On' && val2 == 'On' && SelectedIndex != '-- Select --' && post_status_msg == 'On') {
+        } //alert(val1);alert(val2);return false;
+        if (val1 == 'On' && val2 == 'On') { alert('passed');
             return true;
         }
-        else {
+        else { alert('failed');
             error_msg = '';
             if (val1 == 'Off')
                 error_msg += " post_title,";
             if (val2 == 'Off')
                 error_msg += " post_content,";
-            if (SelectedIndex == '-- Select --')
-                error_msg += " post type";
-            if (post_status_msg == 'Off')
-                error_msg += " post_status";
-            showMapMessages('error', 'Error: ' + error_msg + ' - Mandatory fields. Please map the fields to proceed.');
+
+            showMessages('error', 'Error: ' + error_msg + ' - Mandatory fields. Please map the fields to proceed.');
             return false;
         }
-    }*/
+    } */
 }
 
 // Select the Mapper for Post/Page
@@ -282,14 +270,14 @@ function hideSuccessMessage() {
 }
 
 function clearmapping(){
-	var total_mfields = document.getElementById('h2').value; 
+	var total_mfields = document.getElementById('header_array').value; 
 	var mfields_arr = document.getElementById('mapping_fields_array').value;
-	var n=mfields_arr.split(",");
+	var n=mfields_arr.split(","); //alert(n.length);
 	var options = '<option id="select">-- Select --</option>';
-	for(var i=0;i<n.length;i++){
+	for(var i=0;i<n.length;i++) {
 		options +="<option value='"+n[i]+"'>"+n[i]+"</option>";
-	}
-	for(var j=0;j<total_mfields;j++){
+	} //alert(options);
+	for(var j=0;j<total_mfields.length;j++){ //alert(document.getElementById('mapping'+j).innerHTML);
 		document.getElementById('mapping'+j).innerHTML = options;
 		document.getElementById('mapping'+j).innerHTML += "<option value='add_custom"+j+"'>Add Custom Field</option>";
 		document.getElementById('textbox'+j).style.display = 'none';

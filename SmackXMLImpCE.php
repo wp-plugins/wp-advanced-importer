@@ -72,7 +72,8 @@ class SmackXMLImpCE extends SmackWpXMLHandler
 	'post_type'	=> 'post',
         'featured_image' => null,
         'post_parent' => 0,
-        'post_status' => 0
+        'post_status' => 0,
+	'comments'	=> null,
     );
 
     // @var array XML headers
@@ -268,13 +269,13 @@ class SmackXMLImpCE extends SmackWpXMLHandler
 						    //Key of my_posts are post headers
 						    array_push($my_title,$my_key);
 						    //Value of my_posts are post contents
-						    if(is_array($my_val)&& $my_key!='postmeta' && $my_key!='comments')
+						    if(is_array($my_val)&& $my_key!='postmeta' && $my_key!='comments' && $my_key!= 'category' && $my_key!= 'post_tag' && $my_key!= 'post_category' && $my_key!='terms')
 							    $my_content[$j][$n]="";
-						    elseif($my_key!='postmeta' && $my_key!='comments')
+						    elseif($my_key!='postmeta' && $my_key!='comments' && $my_key!= 'category' && $my_key!= 'post_tag' && $my_key!= 'post_category' && $my_key!='terms')
 							    $my_content[$j][$n]=$my_val;
 						    //In WXR file, post_categories and post_tags will be in terms key
 						    if($my_key=='terms')
-						    {
+						    { 
 							    $x=0;$z=0;
 							    foreach($my_val as $my_category)
 							    {	$y=0;
@@ -284,10 +285,12 @@ class SmackXMLImpCE extends SmackWpXMLHandler
 									    if($categ_key=='domain')
 									    {	
 										    //Some headers are in domain
-										    if($categ_val)
+										    if($categ_val){
+											if(!in_array($categ_val, $all_domain))
 											    $all_domain[$z]=$categ_val;
-										    else
-											    $all_domain[$z]=null;
+										    } else {
+										//	    $all_domain[$z]=null;
+										    }
 										    $z++;
 									    }
 									    if(isset($categ_key))
@@ -304,19 +307,22 @@ class SmackXMLImpCE extends SmackWpXMLHandler
 								    $x++;
 							    }
 
-						    }
+						    } 
 						    if($my_key=='postmeta')
 						    {
-							$pm = 0;
 							foreach($my_val as $pmArr){
 								$postmetaArr[$j]['postmeta'][$pmArr['key']] = $pmArr['value'];
-							} $pm++;
+							} 
 						    } 
-						if($my_key!='postmeta' && $my_key!='comments')
+						    if($my_key == 'comments')
+						    {
+							$commentsArr[$j]['comments']= $my_val;
+						    } 
+						if($my_key!='postmeta' && $my_key!='comments' && $my_key!= 'category' && $my_key!= 'post_tag' && $my_key!= 'post_category')
 						    $n++;
 					    }
 					$my_content[$j][$n]="";
-				    }
+				    } 
 				    //Remove duplicates from my_title
 				    $my_title=array_unique($my_title); 
 				    //Remove duplicates from all_domain
@@ -330,47 +336,34 @@ class SmackXMLImpCE extends SmackWpXMLHandler
 				    {	
 					    //Make a serial index	
 					    $my_titles[$l]=$value;$l++;
-				    } 
+				    }	
 				    // collect post_categories and post_tags values
-                                    for($l=0;$l<count($all_domain);$l++)
-                                    {
-                                            for($m=0;$m<$i;$m++)
-                                            {
-                                                    for($n=0;$n<count($terms_key[$m]);$n++)
-                                                    {                             
-                                                            for($j=0;$j<count($terms_val[$m]);$j++)
-                                                            { 
-								if(isset($all_domain[$l]) && isset($terms_val[$m][$n][$j]) && $all_domain[$l]==$terms_val[$m][$n][$j])
-                                                                    {
-                                                                            for($k=0;$k<count($terms_val[$m][$n]);$k++)
-                                                                            {
-                                                                                    if($terms_key[$m][$n][$k]=='name'){
-											if(!empty($domain_name[$l][$m])){
-											    if($all_domain[$l] == 'post_tag'){
-	                                                                                            $domain_name[$l][$m].=$terms_val[$m][$n][$k].', ';												  }else{
-												    $domain_name[$l][$m].=$terms_val[$m][$n][$k].'|';
-											    }
-											}
-											else{
-											    if($all_domain[$l] == 'post_tag'){
-												    $domain_name[$l][$m]=$terms_val[$m][$n][$k].', ';
-											    }else{
-												    $domain_name[$l][$m]=$terms_val[$m][$n][$k].'|';
-											    }
-											}
-										    }
-                                                                            }
-                                                                    }
-							    }
-                                                    }
-					    }
-				    } 
+
+				for($n=0;$n<$i;$n++){
+					for($m=0;$m<count($terms_val[$n]);$m++){ 
+						if(in_array($terms_val[$n][$m][2],$all_domain)){
+							$domain_name[$n][$terms_val[$n][$m][2]][$m] = $terms_val[$n][$m][0];
+						}
+						
+					}
+				} 
 				    //Insert post_categories and post_tags values
-				    for($l=0;$l<count($all_domain);$l++)
-				    {
-					    for($m=0;$m<count($my_content);$m++)
-						    array_push($my_content[$m],$domain_name[$l][$m]);
-				    }
+				    for($l=0;$l<count($my_content);$l++)
+				    {   
+					    if(is_array($domain_name[$l])){
+						    if(array_key_exists('post_tag', $domain_name[$l]) && array_key_exists('category', $domain_name[$l])){
+							    array_push($my_content[$l],$domain_name[$l]);
+						    } else {
+							    if(!array_key_exists('post_tag', $domain_name[$l])){
+								    $domain_name[$l]['post_tag'] = array();
+							    }
+							    if(!array_key_exists('category', $domain_name[$l])){
+								    $domain_name[$l]['category'] = array();
+							    }
+							    array_push($my_content[$l],$domain_name[$l]);
+						    }
+					    }
+				    }  
 				    for($l=0;$l<count($postmetaArr);$l++)
                                     {
 					    for($m=0;$m<count($my_content);$m++){
@@ -378,7 +371,13 @@ class SmackXMLImpCE extends SmackWpXMLHandler
                 	                            array_push($my_content[$m],$postmetaArr[$l]);
 					    }
 				    }
-
+				    for($l=0;$l<count($commentsArr);$l++)
+				    {
+					    for($m=0;$m<count($my_content);$m++){
+						if($l == $m)
+						    array_push($my_content[$m],$commentsArr[$l]);
+					    }
+				    }
 				    $data_rows=$my_content;
 				    $this->headers=$my_titles;
 				    //    ini_set("auto_detect_line_endings", false);
@@ -409,7 +408,6 @@ class SmackXMLImpCE extends SmackWpXMLHandler
 #	$impRen = new RenderXMLCE;
 #	echo $impRen->showMessage('error', "File Not Exists in this location $file");
 		    }
-	//print '<pre>';print_r($data_rows);die;
        return $data_rows;
     }
       /**
@@ -423,6 +421,8 @@ class SmackXMLImpCE extends SmackWpXMLHandler
 
 	    $smack_taxo = array();
 	    $custom_array = array();
+	    $tags['post_tag'] = array();
+	    $categories['category'] = array();
 	    if(!empty($_POST ['filename'])){
 		$file = $_POST ['filename'];
 	    }else{
@@ -472,25 +472,34 @@ class SmackXMLImpCE extends SmackWpXMLHandler
             }
         }
 	for($dc=0;$dc<count($data_rows);$dc++){
-        foreach ($data_rows[$dc] as $key => $value) {
-            for ($i = 0; $i < count($value); $i++) {
+        foreach ($data_rows[$dc] as $key => $value) {  
+            for ($i = 0; $i < count($value)+1; $i++) { 
+                $smack_taxo = array();
+                $custom_array = array();
+                $post_tags = array();
+                $post_categories = array();
+
                 if (array_key_exists('mapping' . $i, $ret_array)) {
                     if ($ret_array ['mapping' . $i] != 'add_custom' . $i) {
                         $strip_CF = strpos($ret_array['mapping' . $i], 'CF: ');
                         if ($strip_CF === 0) {
                             $custom_key = substr($ret_array['mapping' . $i], 4);
-                            $custom_array[$custom_key] = $value[$i];
-                        } else {
-                            $new_post[$ret_array['mapping' . $i]] = $value[$i];
-                        }
+			    $custom_array[$custom_key] = $value[$i];
+			} else {
+				if(is_array($value[$i])){  
+					foreach($value[$i] as $dKey => $dVal){ 
+						$new_post[$dKey] = $dVal;
+					}
+				}
+				else{
+					$new_post[$ret_array['mapping' . $i]] = $value[$i];
+				}
+			}
                     } else {
                         $new_post [$ret_array ['textbox' . $i]] = $value [$i];
                         $custom_array [$ret_array ['textbox' . $i]] = $value [$i];
                     }
                 }
-		elseif(in_array('postmeta',$value)){
-			$new_post['postmeta'] = $value[$i]['postmeta'];
-		}
             }
 
             for ($inc = 0; $inc < count($value); $inc++) {
@@ -516,7 +525,7 @@ class SmackXMLImpCE extends SmackWpXMLHandler
                     $smack_taxo [$ckey] = null;
                     $taxo_check = 1;
                 }
-                if ($ckey != 'post_category' && $ckey != 'post_tag' && $ckey != 'featured_image' && $ckey != $smack_taxo [$ckey] && $ckey != 'postmeta') {
+                if ($ckey != 'category' && $ckey != 'post_tag' && $ckey != 'featured_image' && $ckey != $smack_taxo [$ckey] && $ckey != 'postmeta' && $ckey != 'comments') {
                     if ($taxo_check == 1) {
                         unset($smack_taxo[$ckey]);
                         $taxo_check = 0;
@@ -533,10 +542,26 @@ class SmackXMLImpCE extends SmackWpXMLHandler
                 } else {
                     switch ($ckey) {
                         case 'post_tag' :
-                            $tags [$ckey] = $new_post [$ckey];
+			    $post_tags = "";
+			    if(is_array($new_post [$ckey]) && !empty($new_post [$ckey])){
+				foreach($new_post [$ckey] as $tagValue){
+					$post_tags [$ckey] .= $tagValue . ',';
+				}
+			    }
+			    if(!empty($post_tags [$ckey])){
+				$post_tags [$ckey] = substr($post_tags [$ckey], 0, -1);
+			    } 
                             break;
-                        case 'post_category' :
-                            $categories [$ckey] = $new_post [$ckey];
+                        case 'category' :
+			    $post_categories = "";
+                            if(is_array($new_post [$ckey]) && !empty($new_post [$ckey])){
+                                foreach($new_post [$ckey] as $catValue){
+                                        $post_categories [$ckey] .= $catValue . '|';
+                                }
+                            }
+                            if(!empty($post_categories [$ckey])){
+                                $post_categories [$ckey] = substr($post_categories [$ckey], 0, -1);
+                            } 
                             break;
                         case 'featured_image' :
                             /*
@@ -617,6 +642,11 @@ class SmackXMLImpCE extends SmackWpXMLHandler
 				}
 			    }
 			    break;
+                        case 'comments' :
+                            if(is_array($cval)){ 
+				$comments_array = $cval;
+                            }
+                            break;
                     }
                 }
             }
@@ -659,7 +689,7 @@ class SmackXMLImpCE extends SmackWpXMLHandler
                         break;
                     default :
                         $poststatus = $data_array['post_status'] = strtolower($data_array['post_status']);
-                        if ($data_array['post_status'] != 'publish' && $data_array['post_status'] != 'private' && $data_array['post_status'] != 'draft' && $data_array['post_status'] != 'pending' && $data_array['post_status'] != 'sticky') {
+                        if ($data_array['post_status'] != 'publish' && $data_array['post_status'] != 'private' && $data_array['post_status'] != 'draft' && $data_array['post_status'] != 'pending' && $data_array['post_status'] != 'sticky' && $data_array['post_status'] != 'trash') {
                             $stripPSF = strpos($data_array['post_status'], '{');
                             if ($stripPSF === 0) {
                                 $poststatus = substr($data_array['post_status'], 1);
@@ -716,7 +746,6 @@ class SmackXMLImpCE extends SmackWpXMLHandler
 		if(isset($data_array ['post_slug'])){
 			$data_array ['post_name'] = $data_array ['post_slug'];
 		}
-
                 if ($data_array)
                     $post_id = wp_insert_post($data_array);
 
@@ -744,21 +773,25 @@ class SmackXMLImpCE extends SmackWpXMLHandler
                     }
 
                     // Create/Add tags to post
-                    if (!empty ($tags)) {
-                        foreach ($tags as $tag_key => $tag_value) {
+		    if (!empty ($post_tags)) {
+                        foreach ($post_tags as $tag_key => $tag_value) {
                             wp_set_post_tags($post_id, $tag_value);
                         }
                     }
 
                     // Create/Add category to post
-                    if (!empty ($categories)) {
-                        $split_cate = explode('|', $categories ['post_category']);
+                    if (!empty ($post_categories)) {
+                        $split_cate = explode('|', $post_categories ['category']);
                         foreach ($split_cate as $key => $val) {
                             if (is_numeric($val))
                                 $split_cate[$key] = 'uncategorized';
                         }
                         wp_set_object_terms($post_id, $split_cate, 'category');
                     }
+		unset($tag_value);
+		unset($split_cate);
+		unset($post_tags);
+		
                     // Add featured image
                     if (!empty ($file) && !empty($attachmentName)) {
                         $wp_filetype = wp_check_filetype(basename($attachmentName), null);
@@ -778,9 +811,25 @@ class SmackXMLImpCE extends SmackWpXMLHandler
                         wp_update_attachment_metadata($attach_id, $attach_data);
                         set_post_thumbnail($post_id, $attach_id);
                     }
-                }
+
+		    // Add comments
+		    if (!empty ($comments_array)){
+			for($cmt=0;$cmt<count($comments_array);$cmt++){
+				$comments_array[$cmt]['comment_post_ID'] = $post_id;
+				$comment_ID = wp_insert_comment($comments_array[$cmt]);
+				if(is_array($comments_array[$cmt]['commentmeta']) && !empty($comments_array[$cmt]['commentmeta'])){
+					foreach($comments_array[$cmt]['commentmeta'] as $cmt_mKey => $cmt_mVal){
+						if(isset( $cmt_mKey ) && isset( $cmt_mVal ))
+							add_comment_meta($comment_ID, $cmt_mKey, $cmt_mVal);
+					}
+				}
+			}
+		    }
+//	die('here');
+                } 
             }
         }
+
 	}
 
         if (file_exists($this->getUploadDirectory() . '/' . $_POST ['filename'])) {

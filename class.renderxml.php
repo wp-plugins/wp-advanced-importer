@@ -96,7 +96,7 @@ class RenderXMLCE
 		$postForm .= '<option value="'.$user["user_login"].'">'.$user["user_login"].'</option>';
 	}			
 	$postForm .= '</select> <b>(or)</b> <input type="text" name="postAuthor" id="postAuthor" /></td></tr>';
-	$postForm .= '<tr><td>Download and Import Attachments </td><td><input type="checkbox" name="download_available" id="download_available" value=""/></td></tr>';
+//	$postForm .= '<tr><td>Download and Import Attachments </td><td><input type="checkbox" name="download_available" id="download_available" value=""/></td></tr>';
 	$postForm .= '<tr><td><label for="importas" > Choose what to import: </label></td>
 			<td><select name="importas[]" id="importas" multiple="multiple">
 			<!--<option>All</option>-->

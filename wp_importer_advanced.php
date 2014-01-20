@@ -3,7 +3,7 @@
  *Plugin Name: WP Advanced Importer
  *Plugin URI: http://www.smackcoders.com
  *Description: A plugin that helps to import the data's from a XML file.
- *Version: 1.0.0
+ *Version: 1.1.0
  *Author: smackcoders.com
  *Author URI: http://www.smackcoders.com
  *
@@ -38,7 +38,7 @@ require_once "languages/" . $impXMLCE->user_language() . ".php";
  */
 function wp_importer_advanced()
 {
-    add_menu_page('XML importer settings', 'WP Importer Advanced', 'manage_options', 'upload_xml_file', 'upload_xml_file', WP_CONTENT_URL . "/plugins/wp-advanced-importer/images/icon.png");
+	add_menu_page('XML importer settings', 'WP Importer Advanced', 'manage_options', 'upload_xml_file', 'upload_xml_file', WP_CONTENT_URL . "/plugins/wp-advanced-importer/images/icon.png");
 }
 
 /**
@@ -123,7 +123,7 @@ function upload_xml_file()
 			<input type="hidden" id="header_array" name="header_array" value="<?php print_r($impXMLCE->headers); ?>"/>
 			<input type='hidden' name='realfilename' id='realfilename' value="<?php echo($_FILES['xml_import']['name']); ?>"/>
 			<input type="hidden" name="version" id="version" value=""/>
-			<input type='hidden' name='selectedImporter' id='selectedImporter' value="<?php echo $_REQUEST['action']; ?>"/>
+<!--			<input type='hidden' name='selectedImporter' id='selectedImporter' value="<?php //echo $_REQUEST['action']; ?>"/> -->
 			<?php 
 		if (isset ($_POST ['Import'])) {
 			$mapping_section['wp_advance_importer']['common'] = $_POST;

@@ -1,4 +1,5 @@
 <div id="for_posts"><!-- Mapping for import posts -->
+<div class="msg" id = "showMsg" style = "display:none;"></div>
 <form class="add:the-list: validate" name="secondform" id="secondform" method="post" onsubmit="return import_xml();"class="secondform">
 <h3>Mapping for import posts</h3>
 <div style="float: left; min-width: 45%">
@@ -28,6 +29,7 @@ if(in_array('All', $_POST['importas'])){
 <input type="hidden" name="Post" id="Post" value="<?php echo $import_post; ?>">
 <input type="hidden" name="Page" id="Page" value="<?php echo $import_page; ?>">
 <input type="hidden" name="CustomPost" id="CustomPost" value="<?php echo $import_custompost;?>">
+<input type='hidden' name='selectedImporter' id='selectedImporter' value='post' />
 <table style="font-size: 12px;">
 <?php
 $count = 0;
@@ -93,6 +95,8 @@ $mFieldsArr .= $mkey.',';
 $mFieldsArr = substr($mFieldsArr, 0, -1);
 ?>
 </table>
+<input type="hidden" id="header_array" name="header_array" value="<?php print($impXMLCE->headers); ?>"/>
+<input type="hidden" id="csv_header_count" name="csv_header_count" value="<?php print(count($impXMLCE->headers));?>" />
 <input type="hidden" id="mapping_fields_array" name="mapping_fields_array" value="<?php print_r($mFieldsArr); ?>"/>
 </div>
 <br/>
