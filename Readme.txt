@@ -3,9 +3,9 @@ Contributors: smackcoders, mayavee, fenzik
 Donate link: http://www.smackcoders.com/donate.html
 Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, restore
 Requires at least: 3.4.0
-Tested up to: 3.8
-Stable tag: 1.1.0
-Version: 1.1.0
+Tested up to: 3.9.1
+Stable tag: 1.2.0
+Version: 1.2.0
 Author: smackcoders
 Author URI: http://profiles.wordpress.org/smackcoders/
 License: GPLv2 or later
@@ -16,11 +16,11 @@ A better advanced for wordpress importer with better image handling, migration a
 
 Are you looking a better advanced for the wordpress importer to migrate your wordpress site or data without much pain. Then WP Advanced Importer is a good solution for you. This plugin is made keeping all wordpress lovers starting from newbies, developers, web masters and bloggers. 
 
-In wordpress importer there are to many odd things may happen like broken image import, blank page results etc. To overcome this issue we have a solution with different perspective. 
+In wordpress importer there are too many odd things may happen like broken image import, blank page results etc. To overcome this issue we have a solution with different perspective. 
 
 The importer mode will allow you to import exported xml with mapping option. Even though all the fields are mapped by plugin you have full control to look into, change or modify any fields. There is a option to test a sample import option to ensure that import works as expected before complete import. Also plugin will check and ensure for any breakage may affect the import. You can also use feature to restore back to initial stage if needed with one simple click.
 
-This plugin will hep all the way to migrate your site or blog without much pain. There is no room to be left in dark with broken import etc.  
+This plugin will help all the way to migrate your site or blog without much pain. There is no room to be left in dark with broken import etc.  
 
 We are planning to have one more mode like backup migration, which will export your complete blog/site as portable to import or migrate.
 
@@ -39,8 +39,9 @@ For guides and tutorials, visit http://www.smackcoders.com .
 
 == Screenshots ==
 
-1. Admin settings for WP Advanced Importer Plugin .
-
+1.Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc.
+2.User friendly easy mapping for any xml file data to wordpress field attributes with sampling.
+3.Advanced duplicate post name and content check with server request control for high performance factor.
 
 == Frequently Asked Questions ==
 
@@ -50,15 +51,24 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 
 == Changelog ==
 
+= 1.2.0 = 
+* Completely revamp the code based on skinny MVC.
+* Improved performance.
+* Complete change in UI. 
+* Logs added.
+* Duplicate detection added.
+
 = 1.1.0 =
 * Added: Comments import feature added for posts,pages and custom posts.
 
 = 1.0.0 =	
 * Initial release version. Tested and found works well without any issues.
 
-
 == Upgrade Notice ==
 
+= 1.2.0 =
+* Upgrade for performance improvement and lot more new features.
+ 
 = 1.1.0 =
 * Upgrade to enjoy comment import feature.
 
