@@ -1,5 +1,5 @@
 <?php
-$post = $page = $custompost = $categories = $users = $customtaxonomy = $comments = $eshop = $wpcommerce = $woocommerce = $settings = $support = $dashboard = $export = $mappingtemplate = $filemanager = $schedulemapping = '';
+$post = $page = $custompost = $categories = $users = $customtaxonomy = $comments = $eshop = $wpcommerce = $woocommerce = $settings = $support = $dashboard = $export = $mappingtemplate = $filemanager = $schedulemapping = $importtype = '';
 $impCEM = CallWPAdvImporterObj::getInstance();
 $settings = $impCEM->getSettings();
 $get_pluginData = get_plugin_data(plugin_dir_path( __FILE__ ).'../index.php'); 
@@ -24,7 +24,7 @@ else if(isset($mod) && !empty($mod))
 }
 $menuHTML = "<div class='csv-top-navigation-wrapper' id='header' name='mainNavigation'><ul id='topNavigation'>";
 #if($post)
-	$menuHTML .="<li class=\"navigationMenu $post\"><a href = 'admin.php?page=".WP_CONST_ADVANCED_XML_IMP_SLUG."/index.php&__module=importtype&step=uploadfile' class = 'navigationMenu-link' id='module4'>Post / Page / CustomPost</a></li>";
+	$menuHTML .="<li class=\"navigationMenu $importtype\"><a href = 'admin.php?page=".WP_CONST_ADVANCED_XML_IMP_SLUG."/index.php&__module=importtype&step=uploadfile' class = 'navigationMenu-link' id='module4'>Post / Page / CustomPost</a></li>";
 #$menuHTML .= "<li class=\"navigationMenu $settings\"><a href = 'admin.php?page=".WP_CONST_ADVANCED_XML_IMP_SLUG."/index.php&__module=settings' class='navigationMenu-link' id='module15'>Settings</a></li>";
 $menuHTML .= "<li class=\"navigationMenu $support\"><a href = 'admin.php?page=".WP_CONST_ADVANCED_XML_IMP_SLUG."/index.php&__module=support' class='navigationMenu-link' id='module16'>Support</a></li>";
 $tabcount = count(get_option('wpadvxmlimpfreesettings')); 
