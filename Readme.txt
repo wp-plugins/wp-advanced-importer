@@ -2,8 +2,8 @@
 Contributors: smackcoders
 Donate link: http://www.smackcoders.com/donate.html
 Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, restore
-Requires at least: 3.4.0
-Tested up to: 3.9.1
+Requires at least: 3.8
+Tested up to: 4.0
 Stable tag: 1.2.1
 Version: 1.2.1
 Author: smackcoders
