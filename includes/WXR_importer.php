@@ -78,7 +78,8 @@ class Knol_WXR_Parser {
  */
 class Knol_WXR_Parser_SimpleXML {
 	function parse( $file ) {
-		$authors = $posts = $categories = $tags = $terms = array();
+		$authors = $posts = $categories = $tags = $terms =  $_post_id = array();
+                $custom_post_type_name = $normal_post_id = $custom_post_type_id = $page_id = '';
 
 		$internal_errors = libxml_use_internal_errors(true);
 		$xml = simplexml_load_file( $file );
@@ -104,10 +105,8 @@ class Knol_WXR_Parser_SimpleXML {
 			$namespaces['excerpt'] = 'http://wordpress.org/export/1.1/excerpt/';
 		if ( ! isset( $namespaces['content_filtered'] ) )
 			$namespaces['content_filtered'] = 'http://wordpress.org/export/1.1/content-filtered/';
-
 		foreach ($xml->xpath('/rss/channel') as $channel) {
 			// grab authors
-
 			foreach ( $channel->xpath('wp:author') as $author_arr ) {
 				$a = $author_arr->children( $namespaces['wp'] );
 				// Knol WXR has Creator stored by 'Knol ID' (author_id) not author_login. author_login is empty in the WXR.
@@ -158,9 +157,31 @@ class Knol_WXR_Parser_SimpleXML {
 
 			// grab posts
 			foreach ( $channel->item as $item ) {
+				$guid=$item->guid;
+				$query_var=parse_url($guid,PHP_URL_QUERY);
+				if(strpos($query_var,'&')){
+					$query_var=explode('&',$query_var);
+					$query_post_type=explode('post_type=',$query_var[0]);
+					$custom_post_type_name=$query_post_type[1];
+					$query_post_id=explode('p=',$query_var[1]);
+                                        $custom_post_type_id=$query_post_id[1];
+				}
+				elseif(strpos($query_var,'page_id')){
+					$query_page_id=explode('page_id=',$query_var);
+					$page_id=$query_page_id[1];
+				}
+				else{
+					$_post_id = explode('p=',$query_var);
+					$normal_post_id = $_post_id[0];
+				}
+                                     
 				$post = array(
 					'post_title' => (string) $item->title,
 					'guid' => (string) $item->guid,
+                                        'post_type' => (string)$custom_post_type_name,
+                      			'is_normal_post' => (string)$normal_post_id,
+                                        'is_custom_post' => (string)$custom_post_type_id,
+                                        'is_page' => (string)$page_id
 				);
 
 				$dc = $item->children( 'http://purl.org/dc/elements/1.1/' );
@@ -268,7 +289,8 @@ class Knol_WXR_Parser_SimpleXML {
 				$posts[] = $post;
 				
 				$posts = array_merge($post_attachments, $posts);
-			}
+			} 
+                      //echo "<pre>";print_r($query_post_type);die;
 		}
 
 		return array(

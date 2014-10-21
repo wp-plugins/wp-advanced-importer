@@ -31,15 +31,17 @@ class WPAdvImporter_includes_helper {
 
 	public $dupPageCount = 0;
 
+	public $get_user_id  = 0;
+
 	public $dupCPTCount = 0;
 
 	// @var int inserted post count
 	public $insPostCount = 0;
-	
-        // @var int inserted post count
+
+	// @var int inserted post count
 	public $insPageCount = 0;
-	
-        // @var int inserted post count
+
+	// @var int inserted post count
 	public $insCPTCount = 0;
 
 	// @var int no post author count
@@ -61,6 +63,11 @@ class WPAdvImporter_includes_helper {
 	public $keys = array();
 
 	// @var array for default columns
+	// @var array CSV headers
+	public $headers = array();
+
+	public $capturedId=0;
+
 	public $defCols = array(
 			'post_title' => null,
 			'post_content' => null,
@@ -68,48 +75,21 @@ class WPAdvImporter_includes_helper {
 			'post_date' => null,
 			'post_name' => null,
 			'post_tag' => null,
+			'post_id'  => null,
 			'post_category' => null,
 			'post_author' => null,
-			'featured_image' => null,
-			'post_parent' => 0,
-			'post_status' => 0
+			'post_parent' => null,
+			'comment_status' => null,
+			'status' => null,
+			'menu_order' => null,
+                        'terms' => null,
+                        'post_format' => null,
+                        'post_password' => null,
 			);
 
-	// @var array CSV headers
-	public $headers = array();
-
-	public $capturedId=0;
+	public $detailedLog = array();
 
 	/* getImportDataConfiguration */
-	public function getImportDataConfiguration(){
-		$importDataConfig = "<div class='importstatus'id='importallwithps_div'>
-                        <table><tr><td>
-                        <label>Import with post status</label><span class='mandatory'> *</span></td><td>
-			<div style='float:left;'>
-                        <select name='importallwithps' id='importallwithps' onChange='selectpoststatus();' >
-                        <option value='0'>Status as in CSV</option>
-                        <option value='1'>Publish</option>
-                        <option value='2'>Sticky</option>
-                        <option value='4'>Private</option>
-                        <option value='3'>Protected</option>
-                        <option value='5'>Draft</option>
-                        <option value='6'>Pending</option>
-                        </select></div>
-			<div style='float:right;'>
-                        <a href='#' class='tooltip'>
-                        <img src='".WP_CONST_ADVANCED_XML_IMP_DIR."images/help.png' />
-                        <span class='tooltipPostStatus'>
-                        <img class='callout' src='".WP_CONST_ADVANCED_XML_IMP_DIR."images/callout.gif' />
-                        Select the status for the post  imported, if not defined within your csv .E.g.publish
-                        <img src='". WP_CONST_ADVANCED_XML_IMP_DIR."images/help.png' style='margin-top: 6px;float:right;' />
-                        </span></a> </div>
-                        </td></tr><tr><td>
-                        <div id='globalpassword_label' class='globalpassword' style='display:none;'><label>Password</label><span class='mandatory'> *</span></div></td><td>
-                        <div id='globalpassword_text' class='globalpassword' style='display:none;'><input type = 'text' id='globalpassword_txt' name='globalpassword_txt' placeholder='Password for all post'></div></td></tr></table>
-                        </div>";
-			return $importDataConfig;
-	}
-
 	/**
 	 * Get upload directory
 	 */
@@ -151,7 +131,7 @@ class WPAdvImporter_includes_helper {
 		require_once(WP_CONST_ADVANCED_XML_IMP_DIRECTORY.'lib/skinnymvc/controller/SkinnyController.php');
 
 		$c = new SkinnyControllerWPAdvXMLFree;
-                $c->main();
+		$c->main();
 	}
 
 	public function getSettings(){
@@ -162,7 +142,40 @@ class WPAdvImporter_includes_helper {
 	{
 		include(plugin_dir_path(__FILE__) . '../templates/menu.php');
 	}
-
+	/**
+	 *To save the user mapping values
+	 *@param $_POST values  
+	 *@param return user
+	 **/
+	public function save_user($sel_user) {
+		$user_imp_type = '';
+		$user_imp_type = $sel_user['user_imp'];
+		if($user_imp_type == 'simple') {
+			$_SESSION['user_imp_type'] = 'simple';
+			$_SESSION['user'] = '';    
+			return $_SESSION['user_imp_type'];                
+		}
+		else if($user_imp_type == 'adv') {
+			if($sel_user['user'] == 'xmluser') {
+				$_SESSION['user_imp_type'] = 'xmluser';           
+				$_SESSION['user'] = $sel_user['xml_author']; 
+				return $_SESSION['user']; 
+			}
+			else if($sel_user['user'] == 'siteuser') {
+				$_SESSION['user_imp_type'] = 'siteuser';           
+				$_SESSION['user'] = $sel_user['ex_user'];  
+				return $_SESSION['user'];   
+			}
+			else if($sel_user['user'] == 'emailuser') {
+				$new_user_name = $sel_user['new_user_name'];
+				$email         = $sel_user['new_user'];
+				$new_user = $new_user_name.'|'.$email;
+				$_SESSION['user_imp_type'] = 'newuser';           
+				$_SESSION['user'] = $new_user; 
+				return $_SESSION['user']; 
+			}
+		}
+	}
 	public function requestedAction($action,$step){
 		$actions = array('dashboard','settings','help','users','comments','eshop','wpcommerce','woocommerce','categories','customtaxonomy','export', 'mappingtemplate');
 		if(!in_array($action,$actions)){
@@ -214,23 +227,23 @@ class WPAdvImporter_includes_helper {
 	 */
 	function getKeyVals()
 	{
-		$cust_fields='';
-		$acf_field=array();
-		global $wpdb;
-		$active_plugins = get_option('active_plugins');
-		$limit = ( int )apply_filters('postmeta_form_limit', 150);
-		$this->keys = $wpdb->get_col("SELECT meta_key FROM $wpdb->postmeta
-				GROUP BY meta_key
-				HAVING meta_key NOT LIKE '\_%' and meta_key NOT LIKE 'field_%'
-				ORDER BY meta_key
-				LIMIT $limit");
+		/*	$cust_fields='';
+			$acf_field=array();
+			global $wpdb;
+			$active_plugins = get_option('active_plugins');
+			$limit = ( int )apply_filters('postmeta_form_limit', 150);
+			$this->keys = $wpdb->get_col("SELECT meta_key FROM $wpdb->postmeta
+			GROUP BY meta_key
+			HAVING meta_key NOT LIKE '\_%' and meta_key NOT LIKE 'field_%'
+			ORDER BY meta_key
+			LIMIT $limit");
 
-		foreach ($this->keys as $val) {
+			foreach ($this->keys as $val) {
 			$this->defCols ["CF: " . $val] = $val;
-		}
+			} */
 
-		
-	
+
+
 	}
 
 	/**
@@ -242,244 +255,168 @@ class WPAdvImporter_includes_helper {
 	 *            for the XML
 	 * @return array formatted XML output as array
 	 */
-	function xml_file_data($file,$fileExtension, $module='post')
-	{
-	//	print('am from xml_file_data');die;
-		#print('$file: '. $file.'</br>');
-		#print('$fileExtension: '.$fileExtension.'<br>');
-		#print('$module: '. $module.'<br>');
+	public function xml_file_data($file,$fileExtension, $module='post') {
 		$file = $this->getUploadDirectory() .'/'. $file;
-               //  echo '<pre>'; print_r($file); die('it works');
 		ini_set("auto_detect_line_endings", true);
 
 		$data_rows = array();
 		$commentsArr = array();
-                $postmetaArr= array();
-                $my_titles = array();
-                $my_content = array();
-                $terms_val = array();
-                $domain_name = array();
+		$postmetaArr= array();
+		$my_titles = array();
+		$my_content = array();
+		$terms_val = array();
+		$domain_name = array();
 		$all_domain=array();
 		$my_title=array();
-//		$this->delim = $delim;
-		//print($this->delim);die;
+		$l = '';
 		$fileexists = file_exists($file);
-	    if ($fileexists) {
-		    if($fileExtension=='xml')
-		    {
-			    $mycls = new Knol_WXR_Parser();
-			    //call parse() function from WXR_importer.php file that returns xml contents as array
-			    $all_arr=$mycls->parse($file); 
-                           
-//echo '<pre>';print_r($all_arr);die('it works');
-                          if(is_array($all_arr))
-			    {
-				    foreach($all_arr as $key => $value)
-				    {
-					    //Under the posts key all Posts are available in all WXR file. 
-					    if($key=='posts')
-					    {
-						    $i=0;
-						    foreach($value as  $post_value)
-						    {
-							if(array_key_exists('post_type',$post_value) && $post_value['post_type'] == $module){
-							    $my_post[$i]=$post_value;
-							    $i++;
+		if ($fileexists) {
+			if($fileExtension=='xml')
+			{
+				$mycls = new Knol_WXR_Parser();
+				$all_arr=$mycls->parse($file); 
+
+				if(is_array($all_arr))
+				{
+					foreach($all_arr as $key => $value)
+					{
+						//Under the posts key all Posts are available in all WXR file. 
+						if($key=='posts')
+						{
+							$i=0;
+							foreach($value as  $post_value)
+							{
+								if(array_key_exists('post_type',$post_value) && $post_value['post_type'] == $module){
+									$my_post[$i]=$post_value;
+									$i++;
+								}
 							}
-						    }
-					    }
-				    }
+						}
+					}
 
-                                  if(isset($module) && $module == 'custompost')  // custompost start here
-                                     {
-                                      foreach($all_arr as $key => $value)
-                                    {
-                                            //Under the posts key all Posts are available in all WXR file. 
-                                            if($key=='posts')
-                                            {
-                                                    $i=0;
-                                                    foreach($value as  $post_value)
-                                                    {
-                                                   // echo '<pre>'; print_r(''); 
-                                                       $eliminate = array('post','page','attachment','revision','nav_menu_item','comments');
-                                                  // echo '<pre>'; print_r($eliminate); die('it works');
-                                                                                                            
-                                                //     echo '<pre>'; print_r($eli);  
-		                                  if(array_key_exists('post_type',$post_value) )
-                                                    {
-  if(isset($post_value['post_type'] ) && $post_value['post_type'] != 'post' && $post_value['post_type'] != 'page' && $post_value['post_type'] != 'attachment'  && $post_value['post_type'] != 'revision'  && $post_value['post_type'] != 'comments'  && $post_value['post_type'] != 'nav_menu_item')
-                                                     { 
-                                                       $custom_array= $post_value;
-                                                          
-                                                        $my_post[$i]=$custom_array;
-                                                            $i++;
-                                                      
-                                                        }
-                                                       }
-                                                   
-                                            }
-                                    }
-                                 }
-                            //  echo '<pre>'; print_r($custom_array);
-                                 }//custom post end here
-                   //   die('it custom post');
+					if( (isset($module)) && ( $module != 'post') && ($module != 'page') )  // custompost start here
+					{
+						foreach($all_arr as $key => $value)
+						{
+							//Under the posts key all Posts are available in all WXR file. 
+							if($key=='posts')
+							{
+								$i=0;
+								foreach($value as  $post_value)
+								{
+									$eliminate = array('post','page','attachment','revision','nav_menu_item','comments');
 
-				    for($j=0;$j<$i;$j++)
-				    {       
-					    $n=0;
-					    // Check here the post_type
+									if(array_key_exists('post_type',$post_value) )
+									{
+										if(isset($post_value['post_type'] ) && $post_value['post_type'] != 'post' && $post_value['post_type'] != 'page' && $post_value['post_type'] != 'attachment'  && $post_value['post_type'] != 'revision'  && $post_value['post_type'] != 'comments'  && $post_value['post_type'] != 'nav_menu_item')
+										{ 
+											$custom_array= $post_value;
+
+											$my_post[$i]=$custom_array;
+											$i++;
+
+										}
+									}
+
+								}
+							}
+						}
+					}//custom post end here
+
+					for($j=0;$j<$i;$j++)
+					{       
+						$n=0;
+						// Check here the post_type
 						$post_types=get_post_types();
-                                               
-					    foreach($my_post[$j] as $my_key => $my_val)
-					    {
-                                         
-						    //Key of my_posts are post headers
-						    array_push($my_title,$my_key);
-						    //Value of my_posts are post contents
-						    if(is_array($my_val)&& $my_key!='postmeta' && $my_key!='comments' && $my_key!= 'category' && $my_key!= 'post_tag' && $my_key!= 'post_category' && $my_key!='terms')
-							    $my_content[$j][$n]="";
-						    elseif($my_key!='postmeta' && $my_key!='comments' && $my_key!= 'category' && $my_key!= 'post_tag' && $my_key!= 'post_category' && $my_key!='terms')
-							    $my_content[$j][$n]=$my_val;
-						    //In WXR file, post_categories and post_tags will be in terms key
-						    if($my_key=='terms')
-						    { 
-							    $x=0;$z=0;
-							    foreach($my_val as $my_category)
-							    {	$y=0;
-								    foreach($my_category as $categ_key => $categ_val)
-								    {      
-									    //domain refered as post_categories or post_tags
-									    if($categ_key=='domain')
-									    {	
-										    //Some headers are in domain
-										    if($categ_val){
-											if(!in_array($categ_val, $all_domain))
-											    $all_domain[$z]=$categ_val;
-										    } else {
-										//	    $all_domain[$z]=null;
-										    }
-										    $z++;
-									    }
-									    if(isset($categ_key))
-										    $terms_key[$j][$x][$y]=$categ_key;
-									    else
-										    $terms_key[$j][$x][$y]=null;
-									    if(isset($categ_val))
-										    $terms_val[$j][$x][$y]=$categ_val;
-									    else
-										    $terms_val[$j][$x][$y]=null;
 
-									    $y++;
-								    }
-								    $x++;
-							    }
+						foreach($my_post[$j] as $my_key => $my_val)
+						{
 
-						    } 
-						    if($my_key=='postmeta')
-						    {
-							foreach($my_val as $pmArr){
-								$postmetaArr[$j]['postmeta'][$pmArr['key']] = $pmArr['value'];
+							//Key of my_posts are post headers
+							array_push($my_title,$my_key);
+							//Value of my_posts are post contents
+							if(is_array($my_val)&& $my_key!='postmeta' && $my_key!='comments' && $my_key!= 'category' && $my_key!= 'post_tag' && $my_key!= 'post_category' && $my_key!='terms')
+								$my_content[$j][$n]="";
+							elseif($my_key!='postmeta' && $my_key!='comments' && $my_key!= 'category' && $my_key!= 'post_tag' && $my_key!= 'post_category' && $my_key!='terms')
+								$my_content[$j][$n]=$my_val;
+							//In WXR file, post_categories and post_tags will be in terms key
+							if($my_key=='terms')
+							{ 
+								$x=0;$z=0;
+								foreach($my_val as $my_category)
+								{	$y=0;
+									foreach($my_category as $categ_key => $categ_val)
+									{      
+										//domain refered as post_categories or post_tags
+										if($categ_key=='domain')
+										{	
+											//Some headers are in domain
+											if($categ_val){
+												if(!in_array($categ_val, $all_domain))
+													$all_domain[$z]=$categ_val;
+											} else {
+											}
+											$z++;
+										}
+										if(isset($categ_key))
+											$terms_key[$j][$x][$y]=$categ_key;
+										else
+											$terms_key[$j][$x][$y]=null;
+										if(isset($categ_val))
+											$terms_val[$j][$x][$y]=$categ_val;
+										else
+											$terms_val[$j][$x][$y]=null;
+
+										$y++;
+									}
+									$x++;
+								}
+
 							} 
-						    } 
-						    if($my_key == 'comments')
-						    {
-							$commentsArr[$j]['comments']= $my_val;
-						    } 
-						if($my_key!='postmeta' && $my_key!='comments' && $my_key!= 'category' && $my_key!= 'post_tag' && $my_key!= 'post_category')
-						    $n++;
-					    }
-                                   
-					$my_content[$j][$n]="";
-				    } 
-				    //Remove duplicates from my_title
-				    $my_title=array_unique($my_title); 
-				    //Remove duplicates from all_domain
-				    $all_domain=array_unique($all_domain);
-                                //   echo '<pre>'; print_r($all_domain);die('it exist');
-				    foreach($all_domain as $key => $value)
-				    {
-					    array_push($my_title,$value);
-				    }
-				    $l=0;
-				    foreach($my_title as $value)
-				    {	
-					    //Make a serial index	
-					    $my_titles[$l]=$value;$l++;
-				    }	
-				    // collect post_categories and post_tags values
-                            //echo '<pre>'; print_r($terms_val);//die('it exist');
-                             if(isset($module) && $module != 'page' && $module != 'custompost')
-                               { 
-				for($n=0;$n<$i;$n++){
-                                     //    print_r($all_domain); 
-					for($m=0;$m<count($terms_val[$n]);$m++){ 
-						if(in_array($terms_val[$n][$m][2],$all_domain)){
-                                               //   echo '<pre>'; print_r($terms_val[$n][$m][2]); die('it exists');
-							$domain_name[$n][$terms_val[$n][$m][2]][$m] = $terms_val[$n][$m][0];
+							if($my_key=='postmeta')
+							{
+								foreach($my_val as $pmArr){
+									$postmetaArr[$j]['postmeta'][$pmArr['key']] = $pmArr['value'];
+								} 
+							} 
+							if($my_key == 'comments')
+							{
+								$commentsArr[$j]['comments']= $my_val;
+							} 
+							if($my_key!='postmeta' && $my_key!='comments' && $my_key!= 'category' && $my_key!= 'post_tag' && $my_key!= 'post_category')
+								$n++;
+						}
 
-						}
+						$my_content[$j][$n]="";
+					} 
+					//Remove duplicates from my_title
+					$my_title=array_unique($my_title); 
+					//Remove duplicates from all_domain
+					$all_domain=array_unique($all_domain);
+					//   echo '<pre>'; print_r($all_domain);die('it exist');
+					foreach($all_domain as $key => $value)
+					{
+						array_push($my_title,$value);
 					}
-				}
-                               
-				    //Insert post_categories and post_tags values
-		//	echo '<pre>'; print_r($domain_name);//die('it exists'); 
-                           for($l=0;$l<count($my_content);$l++)
-				    {   
-					    if(is_array($domain_name[$l])){
-						    if(array_key_exists('post_tag', $domain_name[$l]) && array_key_exists('category', $domain_name[$l])){
-							    array_push($my_content[$l],$domain_name[$l]);
-						    } else {
-							    if(!array_key_exists('post_tag', $domain_name[$l])){
-								    $domain_name[$l]['post_tag'] = array();
-							    }
-							    if(!array_key_exists('category', $domain_name[$l])){
-								    $domain_name[$l]['category'] = array();
-							    }
-							    array_push($my_content[$l],$domain_name[$l]);
-						    }
-					    }
-				    }
-                             
-#print('<pre>'); #print_r($my_content); 
-				    for($m=0;$m<count($my_content);$m++){
-					$get_last_index = count($my_content[$m]); 
-					if(array_key_exists($m,$postmetaArr)){
-						foreach($my_content[$m][$get_last_index] as $newMetaKey => $newMetaVal){
-							$my_content[$m][$get_last_index][$newMetaKey] = $newMetaVal;
-						}
-						foreach($postmetaArr[$m] as $postmetaKey => $postmetaVal){
-							$my_content[$m][$get_last_index][$postmetaKey] = $postmetaVal;
-						}
-					}
-				    }
-#print_r($my_content); print_r($postmetaArr);
-#die;
-                                    for($m=0;$m<count($my_content);$m++){
-                                        $get_last_index = count($my_content[$m]); 
-                                        if(array_key_exists($m,$commentsArr)){
-                                                foreach($my_content[$m][$get_last_index] as $newMetaKey => $newMetaVal){
-                                                        $my_content[$m][$get_last_index][$newMetaKey] = $newMetaVal;
-                                                }       
-                                                foreach($commentsArr[$m] as $commentsKey => $commentsVal){
-                                                        $my_content[$m][$get_last_index][$commentsKey] = $commentsVal;
-                                                }       
-                                        }       
-                                    }
-                              }
-					$data_rows=$my_content;
+					$l=0;
+					foreach($my_title as $value)
+					{	
+						//Make a serial index	
+						$my_titles[$l]=$value;$l++;
+					}	
+					// collect post_categories and post_tags values
+					//	$data_rows=$my_content;
 					$this->headers=$my_titles;
-				//echo '<pre>'; print_r($data_rows); die('coming');
-}
-		}
-                  
-                   } else {
+				}
+			}
 
-		
-         }		return $data_rows;
-       
-	
- }
-      
+		} else {
+
+
+		}		return $my_titles;
+
+
+	}
 
 
 	/**
@@ -488,8 +425,7 @@ class WPAdvImporter_includes_helper {
 	 * @param string type = (title|content), string content
 	 * @return boolean
 	 */
-	function duplicateChecks($type = 'title', $text, $gettype)
-	{
+	function duplicateChecks($type = 'title', $text, $gettype) {
 		global $wpdb;
 		//$this->dupPostCount = 0;
 		if ($type == 'content') {
@@ -513,7 +449,7 @@ class WPAdvImporter_includes_helper {
 					if($gettype != 'post' && $gettype != 'page'){
 						$this->dupCPTCount++;
 					}
-					#$this->dupPostCount++;
+#$this->dupPostCount++;
 					return false;
 				}
 			}
@@ -532,475 +468,649 @@ class WPAdvImporter_includes_helper {
 		if($gettype != 'post' && $gettype != 'page'){
 			$this->dupCPTCount++;
 		}
-		#$this->dupPostCount++;
-		return false;
+#$this->dupPostCount++;
+		return $post_exist;
 	}
+	/**
+	 *Function to get the selected post type  
+	 *@param return post type as array
+	 **/
+	public function to_import() {
+		global $wpdb;
+		$ex_arr = array();
+		$ex_arr  =  get_option('to_import');        
+		return $ex_arr;
+	}
+	/**
+	 *Function for exclude the un choosen post types 
+	 *@param post_type , post_array
+	 *@param return excluded post_array
+	 **/
+	public function exclude_list($post_type,$post_arr) {
+		global $wpdb;
+		$exclusion_list = array();
+		$exclusion_list = get_option('exclude_keys');
+		if(!empty($exclusion_list)) {
+			if(array_key_exists($post_type,$exclusion_list)) {
+				foreach($exclusion_list as $post_key) {
+					foreach($post_key as $pkey => $pval) {
+						unset($post_arr[$pval]);
+					}
+				}
+			}
+		}
+		return $post_arr;
+	}
+	/**
+	 *Function for upoladed zip media handling 
+	 *@param attachment path as url
+	 *@param image url
+	 **/
+	public function get_img_from_zip($attach_url) {
+		$zip_location = $file_url = '';
+		$get_base_name= @basename($attach_url); 
+		$zip_location = $_SESSION['img_path'];
+		$url_location = $_SESSION['img_path_url'];
+		$files_array  = $this->wp_adv_importer_fetch_all_files($zip_location);              
+		foreach($files_array as $singleFile)      {
+			$get_file_name = explode('/',$singleFile);
+			$c = count($get_file_name);
+			$temp_file_name = $get_file_name[$c - 1];
+			$temp_file_month = $get_file_name[$c - 2];
+			$temp_file_year  = $get_file_name[$c - 3];
+			//   $temp_file_uploads = $get_file_name[$c - 4];
+			if($temp_file_name == $get_base_name) {
+				if( (is_numeric($temp_file_year)) && (is_numeric($temp_file_month)) ) {
+					$file_url = $url_location .'/'.$temp_file_year .'/'.$temp_file_month.'/'.$temp_file_name;
+					return $file_url;
+				}
+				else {
+					$file_url = $url_location.'/'.$temp_file_name;
+					return $file_url;
+				}  
+			}
+		}   
 
+	} 
 
 	/**
-	 * function to map the csv file and process it
+	 *Function for recursive scaning the directory
+	 *@param upload dir path
+	 *@param available file with path
+	 **/
+	public function wp_adv_importer_fetch_all_files($dir)  { 
+		$root = scandir($dir); 
+		foreach($root as $value) 
+		{ 
+			if($value === '.' || $value === '..') 
+				continue;
+
+			if(is_file("$dir/$value"))	{
+				$files[] = "$dir/$value";continue;
+			}
+			foreach($this->wp_adv_importer_fetch_all_files("$dir/$value") as $value) 
+			{ 
+				$files[] = $value; 
+			} 
+		} 
+		return $files; 
+	}
+	/**
+	 *Function for process author 
+	 *@param post_array,current limit,auth_type,selected user from user mapping
+	 *@param return user_id
+	 **/
+	public function processAuthor($get_details , $currentLimit ,$type ,$ex_user) {
+		$new_user = '';
+		if($type == 'siteuser') {
+			return $ex_user;
+		}
+		if($type ==  'newuser') {
+			$new_user = explode('|',$ex_user);
+			$user_array['user_login'] = $new_user[0];
+			$user_array['user_email'] = $new_user[1];
+			$user_array['role'] = 'subscriber';
+			$user_array['first_name'] = $new_user[0];
+			$user_array['user_pass']  = wp_generate_password(12,false);
+			$user_exist = $this->user_check($user_array);
+			if(!empty($user_exist)) {
+				$user_id = $user_exist;
+				$this->get_user_id = $user_id;
+				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_id . " -  </b> is already exists";
+				return false;
+			}
+			else {
+				$user_id = wp_insert_user($user_array);
+				$this->get_user_id = $user_id;
+				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> has been created";
+				return false;  
+			}
+		}
+		foreach($get_details['authors'] as $auth_key => $auth_val) {
+			foreach($auth_val as $param_key => $param_val)   {
+				if(isset($param_key)) {
+					if($param_key == 'author_login'){
+						$role = (array) $param_val;   
+						foreach($role as $role_val) {   
+							$user_array['user_login'] = $role_val;
+							$user_array['role'] = $role_val;       
+						}
+					}
+					else if($param_key == 'author_email') {
+						$user_array['user_email'] = $param_val;
+						$user_array['user_pass'] = wp_generate_password( 12, false );
+					}
+					else if($param_key == 'author_first_name') {
+						$user_array['first_name'] = $param_val;
+					} 
+					else if($param_key == 'author_last_name')  {
+						$user_array['last_name']  = $param_val;
+					}
+					else if($param_key == 'author_display_name') {
+						$user_array['display_name'] = $param_val;
+
+					}   
+
+				}
+			}
+			$user_exist = $this->user_check($user_array);
+			if(!empty($user_exist)) {
+				$user_id = $user_exist;
+				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists";
+			}
+			else {
+				if($type == 'xmluser') { 
+					if($role_val == $ex_user) {
+						$user_id = wp_insert_user($user_array);
+						$this->get_user_id = $user_id;
+						$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists";                           return false;
+					}
+				}
+				else {
+					$user_id = wp_insert_user($user_array);
+
+				}
+				$current_user = wp_get_current_user();
+				$admin_email = $current_user->user_email;
+				$headers = "From: Administrator <$admin_email>" . "\r\n";
+				$message = "Hi,You've been invited with the role of ".$user_array['role'].". Here, your login details."."\n"."username: ".      $user_array['user_login']."\n"."userpass: ".$user_array['user_pass']."\n"."Please click here to login ".wp_login_url();
+				$emailaddress = $user_array['user_email'];
+				$subject = 'Login Details';
+				if(isset($user_array)){
+					$response = wp_mail($emailaddress, $subject, $message, $headers);
+				}
+				$this->detailedLog[$user_id]['verify_here'] = "<span style ='padding:5px;' > The user - <b> ". $user_array['user_login'] . " </b> - has been created </span>";
+
+			}
+			if($type == 'xmluser') {
+				if($role_val == $ex_user) {
+					return $user_id;
+				}
+			}
+
+			unset($user_array);
+
+
+		}
+
+
+	}
+	/**
+	 * function to map the xml file and process it
 	 *
-	 * @return boolean
+	 * @return post_id
 	 */
-	function processDataInWP($data_rows,$ret_array,$session_arr,$module)
-	{
-		global $wpdb;
-                $new_post = array();
-               
-                $checktype=array();
-                $qar_type = array();
-                $checktype['wp_advanced_importer']['common']['type'] = array(); 
-		$post_id = '';
-                $cpt = '';
-		$smack_taxo = array();
-		$custom_array = array();
-		$seo_custom_array= array();
-                $cpt = $data_rows[15];		
-		$headr_count = $ret_array['h2'];
-		for ($i = 0; $i < count($data_rows); $i++) {
-			if (array_key_exists('mapping' . $i, $ret_array)) {
-            
-				if($ret_array ['mapping' . $i] != '-- Select --'){
-					if ($ret_array ['mapping' . $i] != 'add_custom' . $i) {
-						$strip_CF = strpos($ret_array['mapping' . $i], 'CF: ');
-						if ($strip_CF === 0) {
-							$custom_key = substr($ret_array['mapping' . $i], 4);
-							$custom_array[$custom_key] = $data_rows[$i];
+	function processDataInWP($get_details,$currentLimit,$user = null,$img,$duptitle,$dupcontent,$authtype) {
+		require_once(ABSPATH . "wp-includes/pluggable.php");
+		require_once( ABSPATH . 'wp-admin/includes/image.php' );
+		$postmeta_terms =  $to_post = $post_data = $post_arr = $ex_type =  array(); 
+		$cur_prev_ids = $tag_name = $img_url =  $local_parent_id = $post_exist = $post_id = $type =  $img_url = $zip_img_url = $guid = '';
+		$sample = array('is_normal_post','is_custom_post','is_sticky','terms','postmeta','comments','is_page','post_id','attachment_url','guid','post_parent');
+		$un_comments = array('comment_user_id','comment_id','commentmeta');
+
+		if(is_array($get_details['posts'])) { 
+			$post_arr = $get_details['posts'];
+			$post_data = $post_arr[$currentLimit];
+			foreach($post_data as $post_key => $post_val ) {
+                                    
+                                
+				if(isset($post_key) && ($post_key == 'post_author' )) {
+					if($authtype != 'simple') {
+						if(!empty($user) && (is_numeric($user))) {
+							$post_data['post_author'] = $user;
+						}
+					} 
+					else if($authtype == 'simple') {
+						$post_data['post_author'] = $this->get_author_id($post_val);
+					}
+					$postmeta_terms = $post_data;
+					$to_post        = $post_data;
+				}
+                                if(isset($post_key) && ($post_key == 'status')) {
+                                             $to_post['post_status'] = $post_val; 
+                                             if(empty($post_val) && ($post_val == 'null') && ($post_val == '') ) {
+                                                  $to_post['post_status'] = 'publish';
+                                                }
+                                        }
+				if( in_array($post_key,$sample,TRUE) ) {
+					unset($to_post['is_normal_post']); unset($to_post['is_custom_post']); unset($to_post['is_sticky']);
+					unset($to_post['terms']);unset($to_post['postmeta']); unset($to_post['comments']); unset($to_post['is_page']);
+					unset($to_post['post_id']);unset($to_post['attachment_url']); unset($to_post['guid']); unset($to_post['post_parent']);   
+				}
+
+				if(isset($post_key) && ($post_key == 'post_type' )) {
+					$ex_type =  $this->to_import(); 
+					if(!in_array($post_val,$ex_type,TRUE)) {
+						return false;
+					}
+					else {
+						$to_post = $this->exclude_list($post_val, $to_post); 
+					} 
+					if(($duptitle == 'true') || ($dupcontent == 'true') ) {
+						$type = 'title';
+						$post_exist =  $this->duplicateChecks($type,$post_data['post_title'],$post_data['post_type']);
+						if($post_exist != 0 ) {
+							$this->detailedLog[$currentLimit]['verify_here'] = "<b>".$post_data['post_title']." </b> is already exist";           
+							return false;
+						}
+
+					}
+
+					if($post_val == 'attachment') {
+						if($img == 'no') {
+							$img_url    = $post_data['attachment_url'];
+							$zip_img_url =  $this->get_img_from_zip($img_url); 
+							$guid        = $this->get_attachment($zip_img_url , $currentLimit);
 						} 
 						else {
-							$new_post[$ret_array['mapping' . $i]] = $data_rows[$i];
+							$guid = $this->get_attachment($post_data['attachment_url'] , $currentLimit); 
 						}
-					} else {
-						$new_post [$ret_array ['textbox' . $i]] = $data_rows [$i];
-						$custom_array [$ret_array ['textbox' . $i]] = $data_rows [$i];
-					}
-				}
-			}
-		}
-             
-		for ($inc = 0; $inc < count($data_rows); $inc++) {
-			foreach ($this->keys as $k => $v) {
-				if (array_key_exists($v, $new_post)) {
-					$custom_array [$v] = $new_post [$v];
-				}
-			}
-		}
-		if(is_array( $new_post )){
-		foreach ($new_post as $ckey => $cval) {
-			$this->postFlag = true;
-			$taxo = get_taxonomies();
-			foreach ($taxo as $taxokey => $taxovalue) {
-				if ($taxokey != 'category' && $taxokey != 'link_category' && $taxokey != 'post_tag' && $taxokey != 'nav_menu' && $taxokey != 'post_format') {
-					if ($taxokey == $ckey) {
-						$smack_taxo [$ckey] = $new_post [$ckey];
-					}
-				}
-			}
-
-			$taxo_check = 0;
-			if (!isset($smack_taxo[$ckey])) {
-				$smack_taxo [$ckey] = null;
-				$taxo_check = 1;
-			}
-			if ($ckey != 'post_category' && $ckey != 'post_tag' && $ckey != 'featured_image' && $ckey != $smack_taxo [$ckey]) {
-				if ($taxo_check == 1) {
-					unset($smack_taxo[$ckey]);
-					$taxo_check = 0;
-				}
-				if (array_key_exists($ckey, $custom_array)) {
-					$darray [$ckey] = $new_post [$ckey];
-				} else {
-					if (array_key_exists($ckey, $smack_taxo)) {
-						$data_array[$ckey] = null;
-					} else {
-						$data_array[$ckey] = $new_post [$ckey];
-					}
-				}
-			} else {
-				switch ($ckey) {
-					case 'post_tag' :
-						$tags [$ckey] = $new_post [$ckey];
-						break;
-					case 'post_category' :
-						$categories [$ckey] = $new_post [$ckey];
-						break;
-					case 'featured_image' :
-						/*
-						 * TODO: Cleanup required
-						 */
-						$split_filename = explode('/', htmlentities($new_post [$ckey]));
-						$arr_filename = count($split_filename);
-						$plain_filename = $split_filename [$arr_filename - 1];
-						$new_post [$ckey] = str_replace(' ', '%20', $new_post [$ckey]);
-						$file_url = $filetype [$ckey] = $new_post [$ckey];
-						$file_type = explode('.', $filetype [$ckey]);
-						$count = count($file_type);
-						$type = $file_type [$count - 1];
-
-						if ($type == 'png') {
-							$file ['post_mime_type'] = 'image/png';
-						} else if ($type == 'jpg' || $type == 'jpeg') {
-							$file ['post_mime_type'] = 'image/jpeg';
-						} else if ($type == 'gif') {
-							$file ['post_mime_type'] = 'image/gif';
-						}
-						$img_name = explode('/', $file_url);
-						$imgurl_split = count($img_name);
-						$img_name = explode('.', $img_name [$imgurl_split - 1]);
-						if (count($img_name) > 2) {
-							for ($r = 0; $r < (count($img_name) - 1); $r++) {
-								if ($r == 0)
-									$img_title = $img_name[$r];
-								else
-									$img_title .= '.' . $img_name[$r];
-							}
+						$filename = $guid;
+						$parent_post_id = $post_data['post_parent'];
+						$filetype = wp_check_filetype( basename( $filename ), null );
+						$wp_upload_dir = wp_upload_dir();
+						$attachment = array(
+								'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ), 
+								'post_mime_type' => $filetype['type'],
+								'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
+								'post_content'   => '',
+								'post_status'    => 'inherit'
+								);
+						$attach_id = wp_insert_attachment( $attachment, $filename, $parent_post_id );
+						$attach_data = wp_generate_attachment_metadata($attach_id, $filename);
+						wp_update_attachment_metadata( $attach_id, $attach_data );
+						set_post_thumbnail($parent_post_id, $attach_id);
+						$attach_details = $attach_id.'|'.$parent_post_id;
+						$_SESSION['attach_id'][$currentLimit] = $attach_details;
+						if(!empty($filename)) {                
+							$this->detailedLog[$currentLimit]['verify_here'] = " <span style = 'padding:5px;'><b> Image - </b>" . basename($filename)."</span>";
 						} else {
-							$img_title = $img_name = $img_name [0];
+							$this->detailedLog[$currentLimit]['verify_here'] = "<span style ='padding:5px;'><b> Image - </b>" . basename($filename)."</span>";
 						}
-						$attachmentName = urldecode($img_title) . '.' . $type;
-						$dir = wp_upload_dir();
-						$get_media_settings = get_option('uploads_use_yearmonth_folders');
-						if($get_media_settings == 1){
-							$dirname = date('Y') . '/' . date('m');
-							$full_path = $dir ['basedir'] . '/' . $dirname;
-							$baseurl = $dir ['baseurl'] . '/' . $dirname;
-						}else{
-							$full_path = $dir ['basedir'];
-							$baseurl = $dir ['baseurl'];
-						}
-						$filename = explode('/', $file_url);
-						$file_split = count($filename);
-						$filepath = $full_path . '/' . urldecode($plain_filename);
-						$fileurl = $baseurl . '/' . $filename [$file_split - 1];
-						if (is_dir($full_path)) {
-							$smack_fileCopy = @copy($file_url, $filepath);
-						} else {
-							wp_mkdir_p($full_path);
-							$smack_fileCopy = @copy($file_url, $filepath);
-						}
+						$to_post['guid'] = $guid;
 
-						if(!function_exists('wp_get_current_user')) {
-						    include(ABSPATH . "wp-includes/pluggable.php"); 
-						}
-						$img = wp_get_image_editor($filepath);
-						if (!is_wp_error($img)) {
+						return false;
+						//     $to_post['attachment_url'] = $guid;               
+					}  // attachement end
+					// for other post types
+					else {
 
-							$sizes_array = array(
-									// #1 - resizes to 1024x768 pixel, square-cropped image
-									array('width' => 1024, 'height' => 768, 'crop' => true),
-									// #2 - resizes to 100px max width/height, non-cropped image
-									array('width' => 100, 'height' => 100, 'crop' => false),
-									// #3 - resizes to 100 pixel max height, non-cropped image
-									array('width' => 300, 'height' => 100, 'crop' => false),
-									// #3 - resizes to 624x468 pixel max width, non-cropped image
-									array('width' => 624, 'height' => 468, 'crop' => false)
-									);
-							$resize = $img->multi_resize($sizes_array);
-						}
-						if ($smack_fileCopy) {
-							$file ['guid'] = $fileurl;
-							$file ['post_title'] = $img_title;
-							$file ['post_content'] = '';
-							$file ['post_status'] = 'attachment';
-						} else {
-							$file = false;
-						}
-						break;
+						$local_post_id = $post_data['post_id'];
+
+
+					}
+
+				} 
+			}
+			$post_id =  wp_insert_post($to_post);
+			if( isset($to_post) && $to_post['post_type'] != 'attachement' ) {
+				$cur_prev_ids = $post_id.'|'.$local_post_id;
+				$_SESSION['post_id'][$currentLimit] = $cur_prev_ids;
+			}  
+
+
+
+			if(isset($postmeta_terms['terms'])) {   
+				foreach($postmeta_terms['terms'] as $tag_key ) {   
+					if(isset($tag_key['domain']) && ($tag_key['domain'] == 'post_tag')) {
+						$tag_name = $tag_key['slug'];
+						wp_set_post_tags($post_id, $tag_name); 
+
+					}
+
+					else if(isset($tag_key['domain']) && ($tag_key['domain'] == 'category')) {
+						$cat[] = $tag_key['slug'];
+						wp_set_object_terms($post_id,$cat,'category');
+
+					}
+
+					else if(isset($tag_key['domain']) && ($tag_key['domain'] == 'post_format')) {
+						wp_set_object_terms($post_id, $tag_key['slug'], 'post_format'); 
+					}
+
+
+					foreach($tag_key as $term_key => $term_val ) {   } }  
+			}
+			if($post_val != 'attachment' ) {
+				foreach($postmeta_terms['postmeta'] as $pkey => $pval) {  
+					update_post_meta($post_id, $pval['key'], $pval['value']);         
 				}
 			}
+			if(isset($postmeta_terms['comments'])) {
+				foreach($postmeta_terms['comments'] as $ckey) {
+					foreach($ckey as $unkey => $unval) {
+						if(in_array($unkey,$un_comments,TRUE))
+							unset($ckey[$unkey]); 
+					}
+					$ckey['comment_post_ID'] = $post_id;
+					wp_insert_comment($ckey);
+				}
+			} 
+
+
 		}
-		}
-//get_option
-                      
-            
-               
-              
-             		if(isset($module) && ($module == 'post' || $module == 'page')) {
-			$data_array['post_type'] = $module;
-	                }
-                        else
-                           {
-                           $data_array['post_type'] = $cpt;   
-                           }
-                      
-               if ($this->titleDupCheck == 'true')
-			$this->postFlag = $this->duplicateChecks('title', $data_array ['post_title'], $data_array ['post_type']);
-
-		if ($this->conDupCheck == 'true' && $this->postFlag)
-			$this->postFlag = $this->duplicateChecks('content', $data_array ['post_content'], $data_array ['post_type']);
-
-		if ($this->postFlag) {
-			unset ($sticky);
-			if (empty($data_array['post_status']))
-				$data_array['post_status'] = null;
-			if (isset($_SESSION['SMACK_MAPPING_SETTINGS_VALUES']['importallwithps']) && $_SESSION['SMACK_MAPPING_SETTINGS_VALUES']['importallwithps'] != 0)
-				$data_array['post_status'] = $_SESSION['SMACK_MAPPING_SETTINGS_VALUES']['importallwithps'];
-
-			switch ($data_array ['post_status']) {
-				case 1 :
-					$data_array['post_status'] = 'publish';
-					break;
-				case 2 :
-					$data_array['post_status'] = 'publish';
-					$sticky = true;
-					break;
-				case 3 :
-					$data_array['post_status'] = 'publish';
-					$data_array ['post_password'] = $_POST ['postsPassword'];
-					break;
-				case 4 :
-					$data_array ['post_status'] = 'private';
-					break;
-				case 5 :
-					$data_array ['post_status'] = 'draft';
-					break;
-				case 6 :
-					$data_array ['post_status'] = 'pending';
-					break;
-				default :
-					$poststatus = $data_array['post_status'] = strtolower($data_array['post_status']);
-					if ($data_array['post_status'] != 'publish' && $data_array['post_status'] != 'private' && $data_array['post_status'] != 'draft' && $data_array['post_status'] != 'pending' && $data_array['post_status'] != 'sticky') {
-						$stripPSF = strpos($data_array['post_status'], '{');
-						if ($stripPSF === 0) {
-							$poststatus = substr($data_array['post_status'], 1);
-							$stripPSL = substr($poststatus, -1);
-							if ($stripPSL == '}') {
-								$postpwd = substr($poststatus, 0, -1);
-								$data_array['post_status'] = 'publish';
-								$data_array ['post_password'] = $postpwd;
-							} else {
-								$data_array['post_status'] = 'publish';
-								$data_array ['post_password'] = $poststatus;
-							}
-						} else {
-							$data_array['post_status'] = 'publish';
-						}
-					}
-					if ($data_array['post_status'] == 'sticky') {
-						$data_array['post_status'] = 'publish';
-						$sticky = true;
-					}
-
-			}
-			// Author name/id update
-			if(isset($data_array ['post_author'])){
-				$authorLen = strlen($data_array ['post_author']);
-				$postuserid = $data_array ['post_author'];
-				$checkpostuserid = intval($data_array ['post_author']);
-				$postAuthorLen = strlen($checkpostuserid);
-				$postauthor = array();
-
-				if ($authorLen == $postAuthorLen) {
-					$postauthor = $wpdb->get_results("select ID from $wpdb->users where ID = \"{$postuserid}\"");
-				} else {
-					$postauthor = $wpdb->get_results("select ID from $wpdb->users where user_login = \"{$postuserid}\"");
-				}
-
-				if (empty($postauthor) || !$postauthor[0]->ID) {
-					$data_array ['post_author'] = 1;
-					$this->noPostAuthCount++;
-				} else {
-					$data_array ['post_author'] = $postauthor [0]->ID;
-				}
-			}
-			else{
-				$data_array ['post_author'] = 1;
-				$this->noPostAuthCount++;
-			}
-		
-			// Date format post
-			if (!isset($data_array ['post_date'])){
-				$data_array ['post_date'] = date('Y-m-d H:i:s');
-			}else{
-				$data_array ['post_date'] = date('Y-m-d H:i:s', strtotime($data_array ['post_date']));
-			}
-			if(isset($data_array ['post_slug'])){
-				$data_array ['post_name'] = $data_array ['post_slug'];
-			}
-
-			//add global password
-			if($data_array){
-				if($ret_array['importallwithps'] == 3){
-					$data_array['post_password'] = $ret_array['globalpassword_txt'];
-					
-				}
-			}
-	//	print('<pre>');print_r($data_array);die('it exist');
-			if (isset($data_array))
-                            {
-				$post_id = wp_insert_post($data_array);
-                            }
-			unset($postauthor);
-			if ($post_id) {
-				$uploaded_file_name=$session_arr['uploadedFile'];
-                                $real_file_name = $session_arr['uploaded_csv_name'];
-				$action = $data_array['post_type'];
-				$created_records[$action][] = $post_id;
-				if($action == 'post'){
-					$imported_as = 'Post';
-				        $this->insPostCount++;
-				}
-				if($action == 'page'){
-					$imported_as = 'Page';
-			           	$this->insPageCount++;
-				}
-				if($action != 'post' && $action != 'page'){
-					$imported_as = 'Custom Post';
-				        $this->insCPTCount++;
-				}
-				$keyword = $action;
-				if (isset($sticky) && $sticky)
-					stick_post($post_id);
-
-				if (!empty ($custom_array)) {
-					foreach ($custom_array as $custom_key => $custom_value) {
-						add_post_meta($post_id, $custom_key, $custom_value);
-					}
-				}
-
-				
-				// Create custom taxonomy to post
-				if (!empty ($smack_taxo)) {
-					foreach ($smack_taxo as $taxo_key => $taxo_value) {
-						if (!empty($taxo_value)) {
-							$split_line = explode('|', $taxo_value);
-							wp_set_object_terms($post_id, $split_line, $taxo_key);
-						}
-					}
-				}
-
-				// Create/Add tags to post
-				if (!empty ($tags)) {
-					foreach ($tags as $tag_key => $tag_value) {
-						wp_set_post_tags($post_id, $tag_value);
-					}
-				}
-
-				// Create/Add category to post
-				if (!empty ($categories)) {
-					$split_cate = explode('|', $categories ['post_category']);
-					foreach ($split_cate as $key => $val) 
-                                         {
-					if (is_numeric($val))
-					$split_cate[$key] = 'uncategorized';
-					}
-					wp_set_object_terms($post_id, $split_cate, 'category');
-				}
-				// Add featured image
-				if (!empty ($file)) {
-					$wp_filetype = wp_check_filetype(basename($attachmentName), null);
-					$wp_upload_dir = wp_upload_dir();
-					$attachment = array(
-							'guid' => $wp_upload_dir['url'] . '/' . basename($attachmentName),
-							'post_mime_type' => $wp_filetype['type'],
-							'post_title' => preg_replace('/\.[^.]+$/', '', basename($attachmentName)),
-							'post_content' => '',
-							'post_status' => 'inherit'
-							);
-					if($get_media_settings == 1){
-						$generate_attachment = $dirname . '/' . $attachmentName;
-					}else{
-						$generate_attachment = $attachmentName;
-					}
-					$uploadedImage = $wp_upload_dir['path'] . '/' . $attachmentName;
-					$attach_id = wp_insert_attachment($attachment, $generate_attachment, $post_id);
-					require_once(ABSPATH . 'wp-admin/includes/image.php');
-					$attach_data = wp_generate_attachment_metadata($attach_id, $uploadedImage);
-					wp_update_attachment_metadata($attach_id, $attach_data);
-					set_post_thumbnail($post_id, $attach_id);
-				}
-			}
-			else{
-				$skippedRecords[] = $_SESSION['SMACK_SKIPPED_RECORDS'];
-			}
-		}
-				unset($data_array);
+		$this->detailedLog[$currentLimit]['verify_here'] = "<span style = 'padding:5px;'> The  <b>  ". $to_post['post_title']. " </b> has been created Verify Here - <a href='" . get_permalink( $post_id ) . "' title='" . esc_attr( sprintf( __( 'View &#8220;%s&#8221;' ), $to_post['post_title'] ) ) . "' rel='permalink'>" . __( 'Web View' ) . "</a> | <a href='" . get_edit_post_link( $post_id, true ) . "' title='" . esc_attr( __( 'Edit this item' ) ) . "'>" . __( 'Admin View' ) . "</a> </span>"; 
+//			$this->detailedLog[$currentLimit]['verify_here'] = $to_post;
+		unset($to_post );         
+		return $post_id;
 	}
-        
-        /**
-         * Delete uploaded file after import process
-         */
-        function deletefileafterprocesscomplete($uploadDir) {
-                //array_map('unlink', glob("$uploadDir/*"));
+
+	/**
+	 * Delete uploaded file after import process
+	 */
+	public function deletexmlprocesscomplete($uploadDir) {
+		//array_map('unlink', glob("$uploadDir/*"));
 		$files = array_diff(scandir($uploadDir), array('.','..')); 
 		foreach ($files as $file) { 
 			(is_dir("$uploadDir/$file")) ? rmdir("$uploadDir/$file") : unlink("$uploadDir/$file"); 
 		} 
-        }
-
-        // Function convert string to hash_key
-        public function convert_string2hash_key($value) {
-                $file_name = hash_hmac('md5', "$value", 'secret');
-                return $file_name;
-        }
-
-	// Function for common footer
-	public function common_footer_for_other_plugin_promotions(){
-		$content = '<div class="accordion-inner">
-			<label class="plugintags"><a href="http://blog.smackcoders.com/category/free-wordpress-plugins/" target="_blank">Social All in One Bot</a></label>
-			<label class="plugintags"><a href="http://blog.smackcoders.com/category/free-wordpress-plugins/google-seo-author-snippet-plugin/" target="_blank">Google SEO Author Snippet</a></label>
-			<label class="plugintags"><a href="http://blog.smackcoders.com/category/free-wordpress-plugins/" target="_blank">WP Advanced Importer</a></label>
-			<label class="plugintags"><a href="http://blog.smackcoders.com/category/free-wordpress-plugins/wp-vtiger/" target="_blank">WP Tiger</a></label>
-			<label class="plugintags"><a href="http://blog.smackcoders.com/category/free-wordpress-plugins/" target="_blank">WP Sugar</a></label>
-			<label class="plugintags"><a href="http://blog.smackcoders.com/category/free-wordpress-plugins/" target="_blank">WP Zoho crm Sync</a></label>
-			<label class="plugintags"><a href="http://blog.smackcoders.com/category/free-wordpress-plugins/" target="_blank">CRM Ecommerce Integration</a></label>
-
-			<label class="plugintags"><a href="http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html" target="_blank">WP Ultimate CSV Importer Pro</a></label>
-			<label class="plugintags"><a href="http://www.smackcoders.com/pro-wordpress-vtiger-webforms-module.html" target="_blank">WP Tiger Pro</a></label>
-			<label class="plugintags"><a href="http://www.smackcoders.com/wordpress-sugar-integration-automated-multi-web-forms-generator-pro.html" target="_blank">WordPress Sugar Pro</a></label>
-			<label class="plugintags"><a href="http://www.smackcoders.com/vtigercrm6-magento-connector.html" target="_blank">VTiger 6 Magento Sync</a></label>
-			<label class="plugintags"><a href="http://www.smackcoders.com/vtigercrm-mailchimp-integration.html" target="_blank">VTiger 6 Mailchimp</a></label>
-			<label class="plugintags"><a href="http://www.smackcoders.com/vtiger-quickbooks-integration-module.html" target="_blank">Vtiger QuickBooks</a></label>
-			<label class="plugintags"><a href="http://www.smackcoders.com/xero-vtiger-integration.html" target="_blank">Vtiger Xero Sync</a></label>
-			<label class="plugintags"><a href="http://www.smackcoders.com/vtiger-crm-hrm-payroll-modules.html" target="_blank">Vtiger HR and Payroll</a></label>
-                        <label class="plugintags"><a href="http://www.smackcoders.com/hr-payroll.html" target="_blank">HR Payroll</a></label>
-			<div style="position:relative;float:right;"><a href="http://www.smackcoders.com/"><img width=80 src="http://www.smackcoders.com/skin/frontend/default/megashop/images/logo.png" /></a></div>
-			</div>';
-		echo $content;
 	}
 
-	// Function for social sharing
-	public function importer_social_profile_share() {
-		$urlCurrentPage = "http://www.smackcoders.com/wp-ultimate-csv-importer.html";
-		$fbimgsrc = WP_CONTENT_URL . "/plugins/" . WP_CONST_ADVANCED_XML_IMP_SLUG . "/images/facebook.png";
-		$googleimgsrc = WP_CONTENT_URL . "/plugins/" . WP_CONST_ADVANCED_XML_IMP_SLUG . "/images/googleplus.png";
-		$linkedimgsrc = WP_CONTENT_URL . "/plugins/" . WP_CONST_ADVANCED_XML_IMP_SLUG . "/images/linkedin.png";
-		$twitimgsrc = WP_CONTENT_URL . "/plugins/" . WP_CONST_ADVANCED_XML_IMP_SLUG . "/images/twitter.png";
-		$strPageTitle = 'WP Ultimate CSV Importer';
-		$linked_in_username = 'smackcoders';
 
-		//Facebook
-		$htmlShareButtons = '<span class="sociallink">';
-		$htmlShareButtons .= '<a id="wpcsv_facebook_share" href="http://www.facebook.com/sharer.php?u=' . $urlCurrentPage  . '" target="_blank">';
-		$htmlShareButtons .= '<img title="Facebook" class="wpcsv" src="' . $fbimgsrc . '" alt="Facebook" />';
-		$htmlShareButtons .= '</a>';
-		$htmlShareButtons .= '</span>';
+	/**
+	 *Function to get post parent
+	 *@param return post_id
+	 **/
+	public function get_post_parent() {
+		global $wpdb;
+		//     $lastid = $wpdb->insert_id;
+		$post_exist = $wpdb->get_results("select ID from " . $wpdb->posts . " ORDER BY ID DESC LIMIT 1");
+		foreach ( $post_exist as $postid ) {
+			$post_id = (int)$postid->ID;
+		}
 
-		//Google Plus
-		$htmlShareButtons .= '<span class="sociallink">';
-		$htmlShareButtons .= '<a id="wpcsv_google_share" href="https://plus.google.com/share?url=' . $urlCurrentPage  . '" target="_blank" >';
-		$htmlShareButtons .= '<img title="Google+" class="wpcsv" src="' . $googleimgsrc . '" alt="Google+" />';
-		$htmlShareButtons .= '</a>';
-		$htmlShareButtons .= '</span>';
+		return $post_id;
+	}
 
-		//Linked in
-		$htmlShareButtons .= '<span class="sociallink">';
-		$htmlShareButtons .= '<a id="wpcsv_linkedin_share" class="wpcsv_share_link" href="http://www.linkedin.com/shareArticle?mini=true&url=' . urlencode($urlCurrentPage)  . '&title='.urlencode($strPageTitle).'&source='.$linked_in_username.'" target="_blank" >';
-		$htmlShareButtons .= '<img title="LinkedIn" class="wpcsv" src="' . $linkedimgsrc . '" alt="LinkedIn" />';
-		$htmlShareButtons .= '</a>';
-		$htmlShareButtons .= '</span>';
+	/**
+	 *Function for covert the file name to hash key 
+	 *@param uploaded xml file name
+	 *@param return excluded post_array
+	 **/
+	public function convert_string2hash_key($value) {
+		$file_name = hash_hmac('md5', "$value", 'secret');
+		return $file_name;
+	}
+	/**
+	 *Function to fetch all get_xml_details 
+	 *@param xml file name
+	 *@param return excluded post_array
+	 **/
+	public function get_xml_details($get) {
+		$all_arr = array();
+		if(isset($get) && $get != '') {
+			$filename = $this->convert_string2hash_key($get);
+		}
+		$file =       $this->getUploadDirectory() .'/'. $filename;
+		$fileexists = file_exists($file);
+		if(isset($fileexists)){
+			$mycls = new Knol_WXR_Parser();
+			$all_arr = $mycls->parse($file);
+		}
+		return  $all_arr;
+	}
+	/**
+	 *Function for fetch the posts 
+	 *@param all_array
+	 *@param return post_group
+	 **/
+	public function get_post_details($all_arr) {
+		$normal_post_group = ''; 
+		foreach($all_arr['posts'] as $key){
+			if( isset($key['is_normal_post'])  && ($key['post_type'] == 'post') ){
+				$is_noraml_post_title[]=$key['post_title'];
+				$is_normal_post_id[]=$key['post_id'];
+				$normal_post_group[]=$key;
+			}
+		}
+		return $normal_post_group;
+	}
+	/**
+	 *Function for fetch the pages 
+	 *@param all_array
+	 *@param return page_group
+	 **/
+	public function get_page_details($all_arr) {
+		$normal_page_group = '';
+		foreach($all_arr['posts'] as $key){
+			if( isset($key['is_page']) && ($key['post_type'] == 'page' )){
+				$is_page_title[]=$key['post_title'];
+				$is_page_id[]=$key['post_id'];
+				$normal_page_group[]=$key;
+			}
+		}
+		return $normal_page_group;
+	}
+	/**
+	 *Function for fetch the author details 
+	 *@param all_array
+	 *@param return author_group
+	 **/
+	public function get_author_details($all_arr) {
+		$authors_name = '';
+		foreach($all_arr['authors'] as $value){
+			$authors_array[]=$value;
+			$authors_name[]=$value['author_login'];
+		}
+		return $authors_name;
+	}
+	/**
+	 *Function for fetch the customposts 
+	 *@param all_array
+	 *@param return custom_post group
+	 **/
+	public function get_custom_details($all_arr) {
+		$custom_post = '';
+		foreach($all_arr['posts'] as $key){
+			if( isset($key['is_custom_post']) && ($key['post_type'] != 'post' ) && ($key['post_type'] != 'page')) {
+				$custom_post_type[]=$key['post_type'];
+				$custom_post[]=$key;
+			}
+		} 
+		return $custom_post;
+	}
+	/**
+	 *Function for get the user list from current site
+	 *@param return user name
+	 **/
+	public function user_list() {
+		global $wpdb;
+		$user_table = $wpdb->users;
+		$getUserName = $wpdb->get_results("select ID from $user_table ");
+		return $getUserName;
 
-		//Twitter
-		$username = "smackcoders";
-		// format the URL into friendly code
-		$twitterShareText = urlencode(html_entity_decode($strPageTitle . ' ', ENT_COMPAT, 'UTF-8'));
-		// twitter share link
-		$htmlShareButtons .= '<span class="sociallink">';
-		$htmlShareButtons .= '<a id="wpcsv_twitter_share" href="http://twitter.com/share?url=' . $urlCurrentPage .'&via='.$username.'&related='.$username.'&text=' . $twitterShareText . '" target="_blank">';
-		$htmlShareButtons .= '<img title="Twitter" class="wpcsv" src="' . $twitimgsrc . '" alt="Twitter" />';
-		$htmlShareButtons .= '</a>';
-		$htmlShareButtons .= '</span>';
-		echo $htmlShareButtons;
+
+	}
+	/**
+	 *Function for check the user existence
+	 *@param user_array
+	 *@param return user id
+	 **/
+	public function user_check($user_array) {
+		global $wpdb;
+		$user_table = $wpdb->users;
+		$getUserId = $wpdb->get_results("select ID from $user_table where user_email = '".$user_array["user_email"]."'");
+		$get_ID = $getUserId[0]->ID;
+		return $get_ID;
+	}
+	/**
+	 *Function for get the user id based on user login name
+	 *@param admin name
+	 *@param return user id
+	 **/
+	public function get_author_id($admin_name) {
+		global $wpdb;
+		$user_table = $wpdb->users;
+		$getUserId = $wpdb->get_results("select ID from $user_table where user_login = '".$admin_name."'");
+		$get_ID = $getUserId[0]->ID;
+		return $get_ID;
+	}
+	/**
+	 *Function to display the user map option
+	 *@param return user
+	 **/
+	public function get_user_map_option() {
+                   $user = '';
+                   $user .= '<div style="height:auto;">';
+                   global $wpdb; 
+                   $filename = '';  $arr =  $xml_author = array();
+		   $user .= '<label class="textalign" style="margin:10px 0px 10px 15px;">User Mapping :</label>';
+                   $user .= '<div id="circlecheck"><input type = "radio" name = "user_imp" id = "simple" class="circlecheckbox" value = "simple"  onclick = "show_user(this.value);" /><label id="optiontext" class="circle-label" for="simple">Simple User Import</label></div>';
+                   $user .= '<div id="circlecheck"><input type = "radio" name = "user_imp" id = "adv" class="circlecheckbox" value = "adv" onclick = "show_user(this.value);" ><label id="optiontext" class="circle-label" for="adv" style="margin-top:5px"> Advanced User Import</label></div>';
+                   $user .= '<div id = "adv_user" style = "display:none;">';
+                   
+                   $user .= ' <input type="hidden" id="module" name="module" value="user_mapping" />';
+                               if(isset($_SESSION['xml_values']['uploadfilename'])) {
+                               $filename = $_SESSION['xml_values']['uploadfilename'];
+                               }
+                               $arr = $this->get_xml_details($filename);
+                               $xml_author = $this->get_author_details($arr);
+                               
+                    $user .= '<div style = "margin-left:25px;"><span id="circlecheck"><input type = "radio" value = "xmluser" id = "xmluser" name = "user" class="circlecheckbox" onclick = "show_user_form(this.id);"  ><label for="xmluser" class="circle-label" id="optiontext"> Assign Author From Your Xml </label></span>
+                      <select name = "xml_author" id ="xml_user"  style="margin-left:12px;margin-bottom:10px;">
+                           <option value = "select"> -- select -- </option> ';
+                                   if(is_array($xml_author)) {
+                                        foreach($xml_author as $auth_key => $auth_val) { 
+                                      $user .=  '<option value = "'.$auth_val.'" >'. $auth_val.'  </option>';
+                                     } } 
+                     $user .= '</select><br/>
+                                 <span id="circlecheck"><input type = "radio" value = "" id ="siteuser" name = "user" class="circlecheckbox" onclick = "show_user_form(this.id);"   > <label for="siteuser" class="circle-label" id="optiontext"> Assign Author from Your Site</label></span>
+                               <select id = "site_user" name = "ex_user" style="margin-left:12px;margin-bottom:10px;" > 
+                               <option value = "select"> -- select -- </option> ';
+                      $wp_user_search = $wpdb->get_results("SELECT ID, display_name FROM $wpdb->users ORDER BY ID");
+                      if(is_array($wp_user_search)) {
+                      foreach ($wp_user_search as $userid) {
+                      $user_id       = (int) $userid->ID;
+                      $user_login    = stripslashes($user_id->user_login);
+                      $display_name  = stripslashes($userid->display_name);
+                      if(isset($user_id)) { 
+                     $user .= '<option value = "'. $user_id .' " > '.$display_name .'  </option>'; 
+                       } 
+                      } 
+                     } 
+                     $user .= ' </select>  </label> <br>';
+                     $user .= '<span id="circlecheck"> <input type = "radio" value = "emailuser" id = "email_user" name = "user"  class="circlecheckbox" onclick = "show_user_form(this.value);" ><label for="email_user" class="circle-label" id="optiontext"> Create New User </label></span>
+                                <div id = "createuser" style = "display:none;"><label id="optiontext" style = "margin-left:10px;">Enter User Login Name <input type = "text" name = "new_user_name" id = "new_user_name" value = ""  placeholder = "Login Name"/>  </label>
+                                  <label id="optiontext" style = "margin-left:15px;"> Enter User Email  <input type = "email" name = "new_user" id = "emailuser" value = "" placeholder = "E-mail" onblur = "user_mapping(this.value);"  > </label></div></div>';
+
+                     $user .= '</div>';
+
+                     return $user;
+
+  }
+        /**
+	 *Function for download the attachement 
+	 *@param external url , current limit
+	 *@param return guid
+	 **/
+	public function get_attachment($guid , $currentLimit) {
+		require_once(ABSPATH . "wp-includes/pluggable.php");
+		require_once(ABSPATH . 'wp-admin/includes/image.php');
+		$dir = wp_upload_dir();
+		$get_media_settings = get_option('uploads_use_yearmonth_folders');
+		if($get_media_settings == 1){
+			$dirname = date('Y') . '/' . date('m');
+			$full_path = $dir ['basedir'] . '/' . $dirname;
+			$baseurl = $dir ['baseurl'] . '/' . $dirname;
+		}else{
+			$full_path = $dir ['basedir'];
+			$baseurl = $dir ['baseurl'];
+		}
+
+		$f_img = $guid;
+		$fimg_path = $full_path;
+		$fimg_name = @basename($f_img);
+		$fimg_name = preg_replace("/[^a-zA-Z0-9._\s]/", "", $fimg_name);
+		$fimg_name = preg_replace('/\s/', '-', $fimg_name);
+		$fimg_name = urlencode($fimg_name);
+
+		$parseURL = parse_url($f_img);
+		$path_parts = pathinfo($f_img);
+		if(!isset($path_parts['extension']))
+			$fimg_name = $fimg_name . '.jpg';
+
+
+		$img_res = $this->get_fimg_from_URL($f_img, $fimg_path, $fimg_name,$currentLimit, $this);
+		$filepath = $fimg_path."/" . $fimg_name;
+
+		if(@getimagesize($filepath)){
+			$img = wp_get_image_editor($filepath);
+			if (!is_wp_error($img)) {
+				$sizes_array = array(
+						// #1 - resizes to 1024x768 pixel, square-cropped image
+						array('width' => 1024, 'height' => 768, 'crop' => true),
+						// #2 - resizes to 100px max width/height, non-cropped image
+						array('width' => 100, 'height' => 100, 'crop' => false),
+						// #3 - resizes to 100 pixel max height, non-cropped image
+						array('width' => 300, 'height' => 100, 'crop' => false),
+						// #3 - resizes to 624x468 pixel max width, non-cropped image
+						array('width' => 624, 'height' => 468, 'crop' => false)
+						);
+				$resize = $img->multi_resize($sizes_array);
+			}
+			$file  = $fimg_path."/".$fimg_name;
+
+		}
+		else    {
+			$file = false;
+		}
+
+		return $file;
+
+	}
+	/**
+	 *Function for get image from url
+	 *@param img_name , img_path , current limit
+         **/
+         public function get_fimg_from_URL($f_img, $fimg_path, $fimg_name, $currentLimit = null, $logObj = ""){
+		if($fimg_path!="" && $fimg_path){
+			$fimg_path = $fimg_path . "/" .$fimg_name;
+		}
+		$ch = curl_init ($f_img);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		$rawdata = curl_exec($ch);
+		if(strpos($rawdata, 'Not Found') != 0) {
+			$rawdata = false;
+		}
+		if ($rawdata == false) {
+			if ($logObj == '') {
+				$this->detailedLog[$currentLimit]['image'] = "<b>Image -</b> host not resolved";
+			} else {
+				$logObj->detailedLog[$currentLimit]['image'] = "<b>Image -</b> host not resolved";
+			}
+		} else {
+			if (file_exists($fimg_path)) {
+				unlink($fimg_path);
+			}
+			$fp = fopen($fimg_path, 'x');
+			fwrite($fp, $rawdata);
+			fclose($fp);
+			$logObj->detailedLog[$currentLimit]['image'] = "<b>Image -</b>" . $fimg_name;
+		}
+		curl_close($ch);
 	}
 
 }

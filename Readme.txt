@@ -4,8 +4,8 @@ Donate link: http://www.smackcoders.com/donate.html
 Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, restore
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 1.2.1
-Version: 1.2.1
+Stable tag: 2.0
+Version: 2.0
 Author: smackcoders
 Author URI: http://profiles.wordpress.org/smackcoders/
 License: GPLv2 or later
@@ -13,6 +13,8 @@ License: GPLv2 or later
 A better advanced for wordpress importer with better image handling, migration and user experience.
 
 == Description ==
+
+Much improved importer with features that are not available in wordpress importer. Users can select from various options selective post type import, attribute mapping to skip any attributes, user mapping, media handling etc.
 
 Are you looking a better advanced for the wordpress importer to migrate your wordpress site or data without much pain. Then WP Advanced Importer is a good solution for you. This plugin is made keeping all wordpress lovers starting from newbies, developers, web masters and bloggers. 
 
@@ -40,8 +42,10 @@ For guides and tutorials, visit http://www.smackcoders.com .
 == Screenshots ==
 
 1.Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc.
-2.User friendly easy mapping for any xml file data to wordpress field attributes with sampling.
-3.Advanced duplicate post name and content check with server request control for high performance factor.
+2.Advanced user mapping allows to assign any desired user or create new user.
+3.Advanced content mapping, user can selectively import their posts attributes and edit mapping.
+4.Advanced Media Handling with url and zip upload.
+5.Advanced duplicate post name and content check with server request control for high performance factor.
 
 == Frequently Asked Questions ==
 
@@ -50,6 +54,13 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 
 
 == Changelog ==
+
+= 2.0 = 
+* Added support for import xml author.
+* Added support for advanced user mapping allows to assign any desired user or create new user
+* Advanced content mapping, user can selectively import their posts attributes and they can edit the mapping by selecting the post types.
+* Advanced Media handling user can download their attachment by xml attachment url or else they can upload the media as a portable zip 
+* Added support for categories, Tags, post format, wordpress custom fields, featured images, comments etc. 
 
 = 1.2.1 = 
 * Hot security fix added.
@@ -68,6 +79,9 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 * Initial release version. Tested and found works well without any issues.
 
 == Upgrade Notice ==
+
+= 2.0 = 
+* Much advanced importer with import manipulation
 
 = 1.2.1 = 
 Important Security Update
