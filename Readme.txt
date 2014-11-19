@@ -1,11 +1,11 @@
 === WP Advanced Importer Plugin ===
 Contributors: smackcoders
 Donate link: http://www.smackcoders.com/donate.html
-Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, restore
+Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, wp all import, xml import, migrate, xml importer, advanced importer, wordpress importer, 
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 2.0
-Version: 2.0
+Stable tag: 2.0.1
+Version: 2.0.1
 Author: smackcoders
 Author URI: http://profiles.wordpress.org/smackcoders/
 License: GPLv2 or later
@@ -41,11 +41,11 @@ For guides and tutorials, visit http://www.smackcoders.com .
 
 == Screenshots ==
 
-1. Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc.
-2. Advanced user mapping allows to assign any desired user or create new user.
-3. Advanced content mapping, user can selectively import their posts attributes and edit mapping.
-4. Advanced Media Handling with url and zip upload.
-5. Advanced duplicate post name and content check with server request control for high performance factor.
+1.Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc.
+2.Advanced user mapping allows to assign any desired user or create new user.
+3.Advanced content mapping, user can selectively import their posts attributes and edit mapping.
+4.Advanced Media Handling with url and zip upload.
+5.Advanced duplicate post name and content check with server request control for high performance factor.
 
 == Frequently Asked Questions ==
 
@@ -54,6 +54,10 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 
 
 == Changelog ==
+
+= 2.0.1 =
+* Modified: Menu Order changes added to avoid the blank page issues.
+* Added: Dynamic Debug mode enable/disable feature in settings module.
 
 = 2.0 = 
 * Added support for import xml author.
@@ -79,6 +83,9 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 * Initial release version. Tested and found works well without any issues.
 
 == Upgrade Notice ==
+
+= 2.0.1 =
+* Upgrade for dynamic debug mode enable/disable feature.
 
 = 2.0 = 
 * Much advanced importer with import manipulation

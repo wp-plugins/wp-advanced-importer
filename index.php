@@ -2,19 +2,27 @@
 /******************************
   Plugin Name: WP Advanced Importer
   Description: A plugin that helps to import the data's from a XML file.
-  Version: 2.0
+  Version: 2.0.1
   Author: smackcoders.com
   Plugin URI: http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html
   Author URI: http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html
  * filename: index.php
  */
+$get_debug_mode = get_option('debug_mode');
+
+if(isset($get_debug_mode) && ($get_debug_mode != 'on')) {
+
+	error_reporting(0);
+	ini_set('display_errors', 'Off');
+}
+
 ob_start();
 ini_set('display_errors', 'Off');
 define('WP_CONST_ADVANCED_XML_IMP_URL', 'http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html');
 define('WP_CONST_ADVANCED_XML_IMP_NAME', 'WP Advanced Importer');
 define('WP_CONST_ADVANCED_XML_IMP_SLUG', 'wp-advanced-importer');
 define('WP_CONST_ADVANCED_XML_IMP_SETTINGS', 'WP Advanced Importer');
-define('WP_CONST_ADVANCED_XML_IMP_VERSION', '2.0');
+define('WP_CONST_ADVANCED_XML_IMP_VERSION', '2.0.1');
 define('WP_CONST_ADVANCED_XML_IMP_DIR', WP_PLUGIN_URL . '/' . WP_CONST_ADVANCED_XML_IMP_SLUG . '/');
 define('WP_CONST_ADVANCED_XML_IMP_DIRECTORY', plugin_dir_path( __FILE__ ));
 define('WP_XMLIMP_PLUGIN_BASE', WP_CONST_ADVANCED_XML_IMP_DIRECTORY);
@@ -27,6 +35,19 @@ if(!class_exists('SkinnyControllerWPAdvImp')){
 
 require_once('includes/WPAdvImporter_includes_helper.php');
 require_once('includes/WXR_importer.php');
+
+// Move Pages above Media
+function smackxmlfree_change_menu_order( $menu_order ) {
+   return array(
+       'index.php',
+       'edit.php',
+       'edit.php?post_type=page',
+       'upload.php',
+       'wp-advanced-importer/index.php',
+   );
+}
+add_filter( 'custom_menu_order', '__return_true' );
+add_filter( 'menu_order', 'smackxmlfree_change_menu_order' );
 
 
 function action_xml_imp_admin_menu()
@@ -107,6 +128,22 @@ function choose_post_types() {
 }
 
 add_action('wp_ajax_choose_post_types' , 'choose_post_types');
+
+function enable_debug_option() {
+   global $wpdb;
+   $debug_name = $_REQUEST['postdata'];
+
+   get_option('debug_mode');
+   if($debug_name == 'on')
+   {
+        update_option('debug_mode',$debug_name);
+   }
+   
+   die;
+
+}
+
+add_action('wp_ajax_enable_debug_option' , 'enable_debug_option');
 
 /**
  *Function for save mapping in database

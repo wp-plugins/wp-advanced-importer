@@ -9,11 +9,17 @@ global $wpdb;
 ?>
         <div style="width:158%;">
 	<div id="accordion">
+	<h3 style='padding-top:7px;padding-left:10px;'> Debug mode </h3>
+	<div class="debug"><div class="squarecheck">
+		
+	        <input type="checkbox" class="" name="debug_mode" id="debug_mode" onclick = "debugoption()"><label for = "debug_mode"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">You can enable/disable the debug mode</label>
+
+        </div>
 	<table class="table-importer">
 	<tr>
 	<td>
 	<div class="steplist">
-	<h3 style="width:15%"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='uploadfile') {?> class= "selected" <?php } ?> style="height:29px"><p style="margin-left:17px;margin-top:4px">Import XML File</p></label></h3><h3 style="width:15%;margin-left:141px;margin-top:-40px"> <label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='user_mapping') {?> class= "selectuser" <?php } ?>><p style="margin-left:24px;margin-top:4px">User Mapping</p></label></h3><h3 style="width:15%;margin-left:282px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='content_mapping') {?> class= "contentselect" <?php } ?>><p style="margin-left:18px;margin-top:4px">Content Mapping</p></label></h3><h3 style="width:14%;margin-left:434px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='media_handle') {?> class= "contentselect" <?php } ?>><p style="margin-left:15px;margin-top:4px">Media Handling</p></label></h3><h3 style="width:16%;margin-left:575px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='import_option') {?> class= "contentselect" <?php } ?>><p style="margin-left:23px;margin-top:4px">Import Option</p></label></h3><h3 style="width:34%;;float:right;margin-top:-40px;height:30px;"></h3>
+	<h3 style="width:15%"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='uploadfile') {?> class= "selected" <?php } ?> style="height:29px"><p style="margin-left:17px;margin-top:4px">Import XML File</p></label></h3><h3 style="width:15%;margin-left:141px;margin-top:-40px"> <label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='user_mapping') {?> class= "selectuser" <?php } ?>><p style="margin-left:24px;margin-top:4px">User Mapping</p></label></h3><h3 style="width:15%;margin-left:282px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='content_mapping') {?> class= "contentselect" <?php } ?>><p style="margin-left:18px;margin-top:4px">Content Mapping</p></label></h3><h3 style="width:14%;margin-left:434px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='media_handle') {?> class= "contentselect" <?php } ?>><p style="margin-left:15px;margin-top:4px">Media Handling</p></label></h3><h3 style="width:16%;margin-left:575px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='import_option') {?> class= "contentselect" <?php } ?>><p style="margin-left:23px;margin-top:4px;-webkit-margin-start: 12px;">Import Option</p></label></h3><h3 style="width:34%;;float:right;margin-top:-40px;height:30px;"></h3>
 	</div>
 	<div id='sec-one' <?php if(isset($_REQUEST['step']) && $_REQUEST['step'] != 'uploadfile') {?> style='display:none' <?php } ?>>
 	<?php if(is_dir($impCE->getUploadDirectory('default'))){ ?>

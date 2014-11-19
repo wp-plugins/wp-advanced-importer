@@ -2,6 +2,7 @@
 $res = $user_array = $postmeta_terms =  array(); 
 $post_count = $page_count = $custom_count  = $total_rec = $tag_name = ''; 
 $file_name = $_POST['postdata'][0]['xml_name'];
+
 $impCE = new WPAdvImporter_includes_helper();
 $get_details = $impCE->get_xml_details($file_name);
 $get_post_info  = $impCE->get_post_details($get_details);

@@ -25,6 +25,30 @@ function show_user_form(value) {
 
 	}
 }
+
+function debugoption()
+{
+	var debugname = document.getElementById('debug_mode').value;
+	var postdata = new Array();
+	var postdata = debugname;
+		jQuery.ajax({
+		type: 'POST',
+		url: ajaxurl,
+		data: {
+		'action'   : 'enable_debug_option',
+		'postdata' : postdata,
+		},
+		success:function(data) {
+	//		alert(data);
+		},
+		error: function(errorThrown){
+		console.log(errorThrown);
+		       }
+		});
+
+}
+
+
 function user_mapping() {
 	var simple_user = document.getElementById('simple').checked;
 	var adv_user    = document.getElementById('adv').checked;
