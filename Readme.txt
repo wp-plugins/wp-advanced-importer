@@ -1,6 +1,6 @@
 === WP Advanced Importer Plugin ===
 Contributors: smackcoders
-Donate link: http://www.smackcoders.com/donate.html
+Donate link: https://www.smackcoders.com/store/donate.html
 Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, wp all import, xml import, migrate, xml importer, advanced importer, wordpress importer, 
 Requires at least: 3.8
 Tested up to: 4.0
@@ -28,7 +28,7 @@ We are planning to have one more mode like backup migration, which will export y
 
 Support and Feature request.
 ----------------------------
-For guides and tutorials, visit http://www.smackcoders.com . 
+For guides and tutorials, visit https://www.smackcoders.com/blog or http://wiki.smackcoders.com/WordPress_Advanced_Importer. 
 
 
 == Installation ==
