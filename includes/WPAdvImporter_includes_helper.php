@@ -393,7 +393,6 @@ class WPAdvImporter_includes_helper {
 					$my_title=array_unique($my_title); 
 					//Remove duplicates from all_domain
 					$all_domain=array_unique($all_domain);
-					//   echo '<pre>'; print_r($all_domain);die('it exist');
 					foreach($all_domain as $key => $value)
 					{
 						array_push($my_title,$value);
@@ -508,7 +507,7 @@ class WPAdvImporter_includes_helper {
 	 **/
 	public function get_img_from_zip($attach_url) {
 		$zip_location = $file_url = '';
-		$get_base_name= @basename($attach_url); 
+		$get_base_name= @basename($attach_url);
 		$zip_location = $_SESSION['img_path'];
 		$url_location = $_SESSION['img_path_url'];
 		$files_array  = $this->wp_adv_importer_fetch_all_files($zip_location);              
@@ -576,13 +575,13 @@ class WPAdvImporter_includes_helper {
 			if(!empty($user_exist)) {
 				$user_id = $user_exist;
 				$this->get_user_id = $user_id;
-				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_id . " -  </b> is already exists";
+				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_id . " -  </b> is already exists<br>";
 				return false;
 			}
 			else {
 				$user_id = wp_insert_user($user_array);
 				$this->get_user_id = $user_id;
-				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> has been created";
+				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> has been created<br>";
 				return false;  
 			}
 		}
@@ -616,14 +615,15 @@ class WPAdvImporter_includes_helper {
 			$user_exist = $this->user_check($user_array);
 			if(!empty($user_exist)) {
 				$user_id = $user_exist;
-				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists";
+				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists<br>";
 			}
 			else {
 				if($type == 'xmluser') { 
 					if($role_val == $ex_user) {
 						$user_id = wp_insert_user($user_array);
 						$this->get_user_id = $user_id;
-						$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists";                           return false;
+						$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists<br>";
+						return false;
 					}
 				}
 				else {
@@ -639,7 +639,7 @@ class WPAdvImporter_includes_helper {
 				if(isset($user_array)){
 					$response = wp_mail($emailaddress, $subject, $message, $headers);
 				}
-				$this->detailedLog[$user_id]['verify_here'] = "<span style ='padding:5px;' > The user - <b> ". $user_array['user_login'] . " </b> - has been created </span>";
+				$this->detailedLog[$user_id]['verify_here'] = "<span style ='padding:5px;' > The user - <b> ". $user_array['user_login'] . " </b> - has been created </span><br>";
 
 			}
 			if($type == 'xmluser') {
@@ -710,7 +710,7 @@ class WPAdvImporter_includes_helper {
 						$type = 'title';
 						$post_exist =  $this->duplicateChecks($type,$post_data['post_title'],$post_data['post_type']);
 						if($post_exist != 0 ) {
-							$this->detailedLog[$currentLimit]['verify_here'] = "<b>".$post_data['post_title']." </b> is already exist";           
+							$this->detailedLog[$currentLimit]['verify_here'] = "<b>".$post_data['post_title']." </b> is already exist<br>";
 							return false;
 						}
 
@@ -719,8 +719,8 @@ class WPAdvImporter_includes_helper {
 					if($post_val == 'attachment') {
 						if($img == 'no') {
 							$img_url    = $post_data['attachment_url'];
-							$zip_img_url =  $this->get_img_from_zip($img_url); 
-							$guid        = $this->get_attachment($zip_img_url , $currentLimit);
+							$zip_img_url= $this->get_img_from_zip($img_url);
+							$guid       = $this->get_attachment($zip_img_url , $currentLimit);
 						} 
 						else {
 							$guid = $this->get_attachment($post_data['attachment_url'] , $currentLimit); 
@@ -743,9 +743,9 @@ class WPAdvImporter_includes_helper {
 						$attach_details = $attach_id.'|'.$parent_post_id;
 						$_SESSION['attach_id'][$currentLimit] = $attach_details;
 						if(!empty($filename)) {                
-							$this->detailedLog[$currentLimit]['verify_here'] = " <span style = 'padding:5px;'><b> Image - </b>" . basename($filename)."</span>";
+							$this->detailedLog[$currentLimit]['verify_here'] = " <span style = 'padding:5px;'><b> Image - </b>" . basename($filename)."</span><br>";
 						} else {
-							$this->detailedLog[$currentLimit]['verify_here'] = "<span style ='padding:5px;'><b> Image - </b>" . basename($filename)."</span>";
+							$this->detailedLog[$currentLimit]['verify_here'] = "<span style ='padding:5px;'><b> Image - </b>" . basename($filename)."</span><br>";
 						}
 						$to_post['guid'] = $guid;
 
@@ -809,7 +809,7 @@ class WPAdvImporter_includes_helper {
 
 
 		}
-		$this->detailedLog[$currentLimit]['verify_here'] = "<span style = 'padding:5px;'> The  <b>  ". $to_post['post_title']. " </b> has been created Verify Here - <a href='" . get_permalink( $post_id ) . "' title='" . esc_attr( sprintf( __( 'View &#8220;%s&#8221;' ), $to_post['post_title'] ) ) . "' rel='permalink'>" . __( 'Web View' ) . "</a> | <a href='" . get_edit_post_link( $post_id, true ) . "' title='" . esc_attr( __( 'Edit this item' ) ) . "'>" . __( 'Admin View' ) . "</a> </span>"; 
+		$this->detailedLog[$currentLimit]['verify_here'] = "<span style = 'padding:5px;'> The  <b>  ". $to_post['post_title']. " </b> has been created Verify Here - <a href='" . get_permalink( $post_id ) . "' title='" . esc_attr( sprintf( __( 'View &#8220;%s&#8221;' ), $to_post['post_title'] ) ) . "' rel='permalink'>" . __( 'Web View' ) . "</a> | <a href='" . get_edit_post_link( $post_id, true ) . "' title='" . esc_attr( __( 'Edit this item' ) ) . "'>" . __( 'Admin View' ) . "</a> </span><br>"; 
 //			$this->detailedLog[$currentLimit]['verify_here'] = $to_post;
 		unset($to_post );         
 		return $post_id;
@@ -1001,7 +1001,6 @@ class WPAdvImporter_includes_helper {
                       if(is_array($wp_user_search)) {
                       foreach ($wp_user_search as $userid) {
                       $user_id       = (int) $userid->ID;
-                      $user_login    = stripslashes($user_id->user_login);
                       $display_name  = stripslashes($userid->display_name);
                       if(isset($user_id)) { 
                      $user .= '<option value = "'. $user_id .' " > '.$display_name .'  </option>'; 
@@ -1033,7 +1032,7 @@ class WPAdvImporter_includes_helper {
 			$full_path = $dir ['basedir'] . '/' . $dirname;
 			$baseurl = $dir ['baseurl'] . '/' . $dirname;
 		}else{
-			$full_path = $dir ['basedir'];
+			$full_path = $dir['basedir'];
 			$baseurl = $dir ['baseurl'];
 		}
 
@@ -1043,14 +1042,12 @@ class WPAdvImporter_includes_helper {
 		$fimg_name = preg_replace("/[^a-zA-Z0-9._\s]/", "", $fimg_name);
 		$fimg_name = preg_replace('/\s/', '-', $fimg_name);
 		$fimg_name = urlencode($fimg_name);
-
-		$parseURL = parse_url($f_img);
+                $parseURL = parse_url($f_img);
 		$path_parts = pathinfo($f_img);
 		if(!isset($path_parts['extension']))
 			$fimg_name = $fimg_name . '.jpg';
-
-
-		$img_res = $this->get_fimg_from_URL($f_img, $fimg_path, $fimg_name,$currentLimit, $this);
+                
+                $img_res = $this->get_fimg_from_URL($f_img, $fimg_path, $fimg_name,$currentLimit, $this);
 		$filepath = $fimg_path."/" . $fimg_name;
 
 		if(@getimagesize($filepath)){
@@ -1097,9 +1094,9 @@ class WPAdvImporter_includes_helper {
 		}
 		if ($rawdata == false) {
 			if ($logObj == '') {
-				$this->detailedLog[$currentLimit]['image'] = "<b>Image -</b> host not resolved";
+				$this->detailedLog[$currentLimit]['image'] = "<b>Image -</b> host not resolved <br>";
 			} else {
-				$logObj->detailedLog[$currentLimit]['image'] = "<b>Image -</b> host not resolved";
+				$logObj->detailedLog[$currentLimit]['image'] = "<b>Image -</b> host not resolved <br>";
 			}
 		} else {
 			if (file_exists($fimg_path)) {
@@ -1108,7 +1105,7 @@ class WPAdvImporter_includes_helper {
 			$fp = fopen($fimg_path, 'x');
 			fwrite($fp, $rawdata);
 			fclose($fp);
-			$logObj->detailedLog[$currentLimit]['image'] = "<b>Image -</b>" . $fimg_name;
+			$logObj->detailedLog[$currentLimit]['image'] = "<b>Image -</b>" . $fimg_name . '<br>';
 		}
 		curl_close($ch);
 	}

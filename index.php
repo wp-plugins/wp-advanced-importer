@@ -2,22 +2,19 @@
 /******************************
   Plugin Name: WP Advanced Importer
   Description: A plugin that helps to import the data's from a XML file.
-  Version: 2.0.1
+  Version: 2.0.2
   Author: smackcoders.com
   Plugin URI: http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html
   Author URI: http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html
  * filename: index.php
  */
+#ini_set('display_errors', 'On');
 $get_debug_mode = get_option('debug_mode');
-
 if(isset($get_debug_mode) && ($get_debug_mode != 'on')) {
-
-	error_reporting(0);
+        error_reporting(0);
 	ini_set('display_errors', 'Off');
 }
-
 ob_start();
-ini_set('display_errors', 'Off');
 define('WP_CONST_ADVANCED_XML_IMP_URL', 'http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html');
 define('WP_CONST_ADVANCED_XML_IMP_NAME', 'WP Advanced Importer');
 define('WP_CONST_ADVANCED_XML_IMP_SLUG', 'wp-advanced-importer');
@@ -52,7 +49,7 @@ add_filter( 'menu_order', 'smackxmlfree_change_menu_order' );
 
 function action_xml_imp_admin_menu()
 {
-	add_menu_page(WP_CONST_ADVANCED_XML_IMP_SETTINGS, WP_CONST_ADVANCED_XML_IMP_NAME, 'manage_options',  __FILE__, array('WPAdvImporter_includes_helper','output_front_xml_page'), WP_CONST_ADVANCED_XML_IMP_DIR . "/images/icon.png");
+	add_menu_page(WP_CONST_ADVANCED_XML_IMP_SETTINGS, WP_CONST_ADVANCED_XML_IMP_NAME, 'manage_options',  __FILE__, array('WPAdvImporter_includes_helper','output_front_xml_page'), WP_CONST_ADVANCED_XML_IMP_DIR . "images/icon.png");
 
 }
 add_action ( "admin_menu", "action_xml_imp_admin_menu" );
@@ -84,7 +81,6 @@ function action_xml_imp_admin_init()
 	}
 }
 add_action('admin_init', 'action_xml_imp_admin_init');
-
 add_action('init', 'WPAdvImpStartSession', 1);
 add_action('wp_logout', 'WPAdvImpEndSession');
 add_action('wp_login', 'WPAdvImpEndSession');

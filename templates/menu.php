@@ -27,6 +27,7 @@ $menuHTML = "<div class='csv-top-navigation-wrapper' id='header' name='mainNavig
 $menuHTML .="<li class=\"navigationMenu $post\"><a href = 'admin.php?page=".WP_CONST_ADVANCED_XML_IMP_SLUG."/index.php&__module=importtype&step=uploadfile' class = 'navigationMenu-link' id='module4'>Imports</a></li>";
 #$menuHTML .= "<li class=\"navigationMenu $settings\"><a href = 'admin.php?page=".WP_CONST_ADVANCED_XML_IMP_SLUG."/index.php&__module=settings' class='navigationMenu-link' id='module15'>Settings</a></li>";
 $menuHTML .= "<li class=\"navigationMenu $support\"><a href = 'admin.php?page=".WP_CONST_ADVANCED_XML_IMP_SLUG."/index.php&__module=support' class='navigationMenu-link' id='module16'>Support</a></li>";
+$menuHTML .= "<li class=\"navigationMenu $settings\"><a href = 'admin.php?page=".WP_CONST_ADVANCED_XML_IMP_SLUG."/index.php&__module=settings' class='navigationMenu-link' id='module15'>Security & Performance </a></li>";
 $tabcount = count(get_option('wpadvxmlimpfreesettings')); 
 $menuHTML .= "</ul>";
 /*$menuHTML .= "<div style='margin-right:10px;width: 250px;float: right;'>";

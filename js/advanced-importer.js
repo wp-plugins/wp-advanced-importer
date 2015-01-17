@@ -17,17 +17,17 @@ function goto_mapping(id){
 	}
 }
 function show_user_form(value) {
+
 	if(value == 'emailuser') {
 		document.getElementById('createuser').style.display = '';
 	}
 	else {
 		document.getElementById('createuser').style.display = 'none';
+       }
 
-	}
 }
 
-function debugoption()
-{
+function debugoption() {
 	var debugname = document.getElementById('debug_mode').value;
 	var postdata = new Array();
 	var postdata = debugname;
@@ -39,7 +39,6 @@ function debugoption()
 		'postdata' : postdata,
 		},
 		success:function(data) {
-	//		alert(data);
 		},
 		error: function(errorThrown){
 		console.log(errorThrown);
@@ -130,7 +129,6 @@ function content_mapping(id)  {
 		document.getElementById('pages').checked = true;
 		document.getElementById('customposts').checked = true;
 	}
-	document.getElementById('edit_mapping').innerHTML = '<option value = "select"> -- select -- </option>';
 	if(jQuery('#posts').prop('checked')) {
 		var posts =  document.getElementById('posts').value; 
 	} else { var posts = 'NULL'; }
@@ -138,37 +136,35 @@ function content_mapping(id)  {
 		var pages = document.getElementById('pages').value;
 	} else { var pages = 'NULL'; }
 	if(jQuery('#customposts').prop('checked')) {
+		document.getElementById('edit_mapping').innerHTML = '<option value = "select"> -- select -- </option>';
 		var custom = document.getElementById('customposts').value;
 	} else { var custom = 'NULL'; }
 
 	var postdata = new Array( {'post':posts,'page':pages,'custom':custom } );
-
 	jQuery.ajax({
-type: 'POST',
-url: ajaxurl,
-data: {
-'action'   : 'choose_post_types',
-'postdata' : postdata,
-},
-success:function(data) {
-var i = '';
-var data = JSON.parse(data); 
-var len = data.length;
-for(i = 0; i<len; i++) {
-if( (data[i] != 'attachment') ) {
-document.getElementById('edit_mapping').innerHTML += '<option value = '+data[i]+'>'+data[i]+'</option>';
-}
-}  
-return false;
+        type: 'POST',
+        url: ajaxurl,
+	data: {
+	'action'   : 'choose_post_types',
+	'postdata' : postdata,
+	},
+       success:function(data) {
+       var i = '';
+       var data = JSON.parse(data); 
+       var len = data.length;
+       for(i = 0; i<len; i++) {
+       if( (data[i] != 'attachment') ) {
+       document.getElementById('edit_mapping').innerHTML += '<option value = '+data[i]+'>'+data[i]+'</option>';
+       }
+       }  
+       return false;
 
-},
+       },
 error: function(errorThrown){
 console.log(errorThrown);
        }
-});
-
-
-}
+	});
+      }
 
 function check_mapping(id) {
 	var cal = document.getElementsByTagName('input');
@@ -179,9 +175,8 @@ function check_mapping(id) {
 			}
 		}
 	}
-
-
 }
+
 function dwnld_attachment(id) {
 	if(id == 'zip_upload') {
 		document.getElementById('adv_media').style.display = '';
@@ -355,7 +350,6 @@ data: {
 //	    'siteurl'  : siteurl
 },
 success:function(data) {
-
 if (parseInt(tmpCnt) < parseInt(total) ) {
 currentlimit = parseInt(currentlimit) + parseInt(tmpCnt);
 document.getElementById('currentlimit').value = currentlimit;
@@ -371,7 +365,7 @@ document.getElementById('log').innerHTML += data+ "<br/>"+"<p style = 'color:gre
 return false;
 }
 document.getElementById('authcnt').value = 0 ;
-document.getElementById('log').innerHTML += data+'<br/>';
+document.getElementById('log').innerHTML += data; //+'<br/>';
 
 },
 error: function(errorThrown){

@@ -7,8 +7,7 @@
 $impCE = new WPAdvImporter_includes_helper(); 
 global $wpdb;
 ?>
-        <div style="width:158%;">
-	<div id="accordion">
+	<div id="accordion" style = "width:100%">
 	<h3 style='padding-top:7px;padding-left:10px;'> Debug mode </h3>
 	<div class="debug"><div class="squarecheck">
 		
@@ -26,7 +25,7 @@ global $wpdb;
 		<input type='hidden' id='is_uploadfound' name='is_uploadfound' value='found' />
 	<?php } else { ?>
 		<input type='hidden' id='is_uploadfound' name='is_uploadfound' value='notfound' />
-        <div class="warning" id="warning" name="warning" style="display:none;margin: 4% 0 4% 10%;"></div>
+        <div class="warning" id="warning" name="warning" style="display:none;margin: 5% 0 6% 20%;position:absolute;top:165px;"></div>
 	<?php } ?>
 	<form action='<?php echo admin_url().'admin.php?page='.WP_CONST_ADVANCED_XML_IMP_SLUG.'/index.php&__module='.$_REQUEST['__module'].'&step=user_mapping'?>' id='browsefile' method='post' name='browsefile' onsubmit="return import_csv();" />
 	<div class="importfile" align='center'>
@@ -40,19 +39,19 @@ global $wpdb;
 	<?php $uploadDir = wp_upload_dir(); ?>
 	<input type="hidden" id="uploaddir" value="<?php echo isset($uploadDir['basedir']) ? $uploadDir['basedir'] : ''; ?>">
 	<input type="hidden" id="uploadFileName" name="uploadfilename" value="">
-	<input type="hidden" id="module" name="module" value="xml_import" />
-       	<input type='hidden' id = 'uploadedfilename' name = 'uploadedfilename' value = ''>
+	<input type="hidden" id="module"   name="module" value="xml_import" />
+       	<input type='hidden' id='uploadedfilename' name = 'uploadedfilename' value = ''>
         <input type="hidden" id="currentlimit" name="currentlimit" value="0"/>
         <input type="hidden" id="authcnt" name="authcnt" value="1"/>
-        <input type='hidden' id = 'total' name = 'total' value = ''/>
-        <input type='hidden' id = 'tmpcnt' name = 'tmpcnt' value = '1'/>
-        <input type = 'hidden' id = 'postcount' name = 'postcount' value = ''/>
-        <input type = 'hidden' id = 'implimit' name = 'implimit' value = '0'/>
-        <input type = 'hidden' id = 'authorcount' name = 'authorcount' value = ''/>
-        <input type = 'hidden' id = 'upload_csv_realname' name = 'upload_csv_realname' value =''>
+        <input type='hidden' id= 'total' name = 'total' value = ''/>
+        <input type='hidden' id= 'tmpcnt' name = 'tmpcnt' value = '1'/>
+        <input type='hidden' id= 'postcount' name = 'postcount' value = ''/>
+        <input type='hidden' id= 'implimit' name = 'implimit' value = '0'/>
+        <input type='hidden' id= 'authorcount' name = 'authorcount' value = ''/>
+        <input type='hidden' id= 'upload_csv_realname' name = 'upload_csv_realname' value =''>
         <input type='hidden' id="siteurl" name="siteurl" value='<?php echo get_site_url(); ?>'>
-        <input type = 'hidden' id = 'current_file_version' name = 'current_file_version' value = ''>
-        <input type = 'hidden' id = 'current_module' name = 'current_module' value = '<?php echo isset($_REQUEST['__module']) ? $_REQUEST['__module'] : ''; ?>' >
+        <input type='hidden' id= 'current_file_version' name = 'current_file_version' value = ''>
+        <input type='hidden' id= 'current_module' name = 'current_module' value = '<?php echo isset($_REQUEST['__module']) ? $_REQUEST['__module'] : ''; ?>' >
         <input type ='hidden' id = 'changetype' name = 'changetype' value =''>
 	<input id="fileupload" type="file" name="files[]" multiple>
 	</span>
@@ -250,19 +249,20 @@ global $wpdb;
         <tr>
         <td>
 <!--          <h3> Import Options </h3>-->
-         <form name='media_handling' action="<?php echo admin_url(); ?>admin.php?page=<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/index.php&__module=<?php echo $_REQUEST['__module']?>&step=import_option"  method="post"  >
+         <form name='media_handling' action="<?php echo admin_url(); ?>admin.php?page=<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/index.php&__module=<?php echo $_REQUEST['__module']?>"  method="post"  >
         <div class='msg' id = 'showMsg' style = 'display:none;'></div>
           <?php  if(isset($_REQUEST['step']) && $_REQUEST['step'] == 'import_option')  {   ?>
           <div id='sec-five' <?php if($_REQUEST['step']!= 'import_option'){ ?> style='display:none;' <?php } ?> >
           <?php
+
                if($_POST['attachment'] == 'dwld_local') {  
               if(isset($_FILES['adv_media'])) {
                $uploaded_compressedFile = $_FILES['adv_media']['tmp_name'];
-               $get_basename_zipfile = explode('.', $_FILES['adv_media']['name']);
-               $basename_zipfile = $get_basename_zipfile[0];
-               $location_to_extract = $uploadDir['basedir'] . '/adv_imp_attachment/' ;
-               $extracted_image_location = $uploadDir['baseurl'] . '/adv_imp_attachment/' . $basename_zipfile;
-               $extracted_image_location_dir = $uploadDir['basedir'] . '/adv_imp_attachment/' ;
+               $get_basename_zipfile    = explode('.', $_FILES['adv_media']['name']);
+               $basename_zipfile        = $get_basename_zipfile[0];
+               $location_to_extract     = $uploadDir['basedir'] . '/adv_imp_attachment/' ;
+               $extracted_image_location= $uploadDir['baseurl'] . '/adv_imp_attachment/' . $basename_zipfile;
+               $extracted_image_location_dir=$uploadDir['basedir'] . '/adv_imp_attachment/' ;
                $zip = new ZipArchive;
                if ($zip->open($uploaded_compressedFile) === TRUE) {
                        $zip->extractTo($location_to_extract);
@@ -311,9 +311,7 @@ global $wpdb;
                  <label id="optiontext" style="margin-left:15px;"> Enter the no. of imports per server requests   <input type = "text" name = "imp_limit" id = "imp_limit" value = "1"  onblur="check_allnumeric(this.value);" style="margin-left:10px"/></label>
         <input type = 'button' name='importfile' id='importtype' value='Import' onclick = "importRecordsbySettings();" class = 'btn btn-primary'    style="float:right;margin-top:24px;margin-right:45px"/>  
         <div id="ajaxloader" style="display:none"><img src="<?php echo WP_CONST_ADVANCED_XML_IMP_DIR; ?>images/ajax-loader.gif"> Processing...</div>
- 
-                 
-         </div>
+        </div>
         <?php } ?>
           </form>
         </td>
@@ -323,12 +321,11 @@ global $wpdb;
 				</table>
 			</div>
                 <input type = 'hidden' id = 'current_step' name = 'current_step' value = 'content_mapping' >
-		<div id='reportLog' class='reportLog' style="width:62%;">
+		<div id='reportLog' class='reportLog' style="width:100%;">
 		<h3>Logs :</h3>
 		<div id="logtabs" class="logcontainer">
 		<div id="log" class='log'>	
 		</div>
 		</div>
 		</div>
-	</div>
 

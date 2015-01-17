@@ -1,11 +1,11 @@
 === WP Advanced Importer Plugin ===
 Contributors: smackcoders
-Donate link: https://www.smackcoders.com/store/donate.html
-Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, wp all import, xml import, migrate, xml importer, advanced importer, wordpress importer, 
+Donate link: http://www.smackcoders.com/donate.html
+Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, restore
 Requires at least: 3.8
-Tested up to: 4.0
-Stable tag: 2.0.1
-Version: 2.0.1
+Tested up to: 4.1
+Stable tag: 2.0.2
+Version: 2.0.2
 Author: smackcoders
 Author URI: http://profiles.wordpress.org/smackcoders/
 License: GPLv2 or later
@@ -28,7 +28,7 @@ We are planning to have one more mode like backup migration, which will export y
 
 Support and Feature request.
 ----------------------------
-For guides and tutorials, visit https://www.smackcoders.com/blog or http://wiki.smackcoders.com/WordPress_Advanced_Importer. 
+For guides and tutorials, visit http://www.smackcoders.com . 
 
 
 == Installation ==
@@ -54,6 +54,10 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 
 
 == Changelog ==
+= 2.0.2 =
+* Added: WordPress 4.1 compatibility checked.
+* Fixed: Importing images related issues.
+* Added: Securities and Performance tab.
 
 = 2.0.1 =
 * Modified: Menu Order changes added to avoid the blank page issues.
@@ -83,6 +87,8 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 * Initial release version. Tested and found works well without any issues.
 
 == Upgrade Notice ==
+= 2.0.2 =
+* Upgrade now for issue fixes and 4.1 compatibility
 
 = 2.0.1 =
 * Upgrade for dynamic debug mode enable/disable feature.

@@ -11,7 +11,7 @@ if(!empty($custom) && $custom == 'customposts') {
 	$impCE = new WPAdvImporter_includes_helper();
 	$get_details = $impCE->get_xml_details($file);
 	$get_custom_info  = $impCE->get_custom_details($get_details);
-	if(isset($get_custom_info)) {
+	if(!empty($get_custom_info)) {
 		$i =0; 
 		foreach($get_custom_info as $get_key => $get_val ) {
 			foreach($get_val as $key  => $val) {
