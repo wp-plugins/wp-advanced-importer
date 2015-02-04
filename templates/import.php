@@ -35,14 +35,16 @@ $total = $total - 1;
 if($implimit == $total ) {
 	foreach($_SESSION['post_id'] as $key => $value )  { 
 		$post_id = explode('|',$value);
-		foreach($_SESSION['attach_id'] as $akey => $aval ) {
-			$attach_id = explode('|',$aval); 
-			if($attach_id[1] == $post_id[1]) {
-				global $wpdb;
-				$file_name = $wpdb->get_results("select guid from " . $wpdb->posts . " where ID  = {$attach_id[0]} ");
-				$update = $wpdb->get_results("update $wpdb->posts set post_parent = {$post_id[0]} where ID = {$attach_id[0]}");
-				set_post_thumbnail($post_id[0], $attach_id[0]);
-			}     
+		if(is_array($_SESSION['attach_id'])) {
+			foreach($_SESSION['attach_id'] as $akey => $aval ) {
+				$attach_id = explode('|',$aval); 
+				if($attach_id[1] == $post_id[1]) {
+					global $wpdb;
+					$file_name = $wpdb->get_results("select guid from " . $wpdb->posts . " where ID  = {$attach_id[0]} ");
+					$update = $wpdb->get_results("update $wpdb->posts set post_parent = {$post_id[0]} where ID = {$attach_id[0]}");
+					set_post_thumbnail($post_id[0], $attach_id[0]);
+				}     
+			}
 		}
 	}                   
 	if($attach == 'no') {

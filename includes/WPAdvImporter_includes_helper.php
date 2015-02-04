@@ -149,7 +149,7 @@ class WPAdvImporter_includes_helper {
 	 **/
 	public function save_user($sel_user) {
 		$user_imp_type = '';
-		$user_imp_type = $sel_user['user_imp'];
+		$user_imp_type = isset($sel_user['user_imp']) ? $sel_user['user_imp'] : '';
 		if($user_imp_type == 'simple') {
 			$_SESSION['user_imp_type'] = 'simple';
 			$_SESSION['user'] = '';    
@@ -489,7 +489,7 @@ class WPAdvImporter_includes_helper {
 		global $wpdb;
 		$exclusion_list = array();
 		$exclusion_list = get_option('exclude_keys');
-		if(!empty($exclusion_list)) {
+		if(!empty($exclusion_list) && is_array($exclusion_list)) {
 			if(array_key_exists($post_type,$exclusion_list)) {
 				foreach($exclusion_list as $post_key) {
 					foreach($post_key as $pkey => $pval) {
@@ -560,6 +560,7 @@ class WPAdvImporter_includes_helper {
 	 *@param return user_id
 	 **/
 	public function processAuthor($get_details , $currentLimit ,$type ,$ex_user) {
+		$user_array = array();
 		$new_user = '';
 		if($type == 'siteuser') {
 			return $ex_user;
@@ -585,74 +586,73 @@ class WPAdvImporter_includes_helper {
 				return false;  
 			}
 		}
-		foreach($get_details['authors'] as $auth_key => $auth_val) {
-			foreach($auth_val as $param_key => $param_val)   {
-				if(isset($param_key)) {
-					if($param_key == 'author_login'){
-						$role = (array) $param_val;   
-						foreach($role as $role_val) {   
-							$user_array['user_login'] = $role_val;
-							$user_array['role'] = $role_val;       
+			foreach($get_details['authors'] as $auth_key => $auth_val) {
+				foreach($auth_val as $param_key => $param_val)   {
+					if(isset($param_key)) {
+						if($param_key == 'author_login'){
+							$role = (array) $param_val;   
+							foreach($role as $role_val) {   
+								$user_array['user_login'] = $role_val;
+								$user_array['role'] = $role_val;       
+							}
 						}
-					}
-					else if($param_key == 'author_email') {
-						$user_array['user_email'] = $param_val;
-						$user_array['user_pass'] = wp_generate_password( 12, false );
-					}
-					else if($param_key == 'author_first_name') {
-						$user_array['first_name'] = $param_val;
-					} 
-					else if($param_key == 'author_last_name')  {
-						$user_array['last_name']  = $param_val;
-					}
-					else if($param_key == 'author_display_name') {
-						$user_array['display_name'] = $param_val;
+						else if($param_key == 'author_email') {
+							$user_array['user_email'] = $param_val;
+							$user_array['user_pass'] = wp_generate_password( 12, false );
+						}
+						else if($param_key == 'author_first_name') {
+							$user_array['first_name'] = $param_val;
+						} 
+						else if($param_key == 'author_last_name')  {
+							$user_array['last_name']  = $param_val;
+						}
+						else if($param_key == 'author_display_name') {
+							$user_array['display_name'] = $param_val;
 
-					}   
+						}   
 
+					}
 				}
-			}
-			$user_exist = $this->user_check($user_array);
-			if(!empty($user_exist)) {
-				$user_id = $user_exist;
-				$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists<br>";
-			}
-			else {
-				if($type == 'xmluser') { 
-					if($role_val == $ex_user) {
-						$user_id = wp_insert_user($user_array);
-						$this->get_user_id = $user_id;
-						$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists<br>";
-						return false;
-					}
+				$user_exist = $this->user_check($user_array);
+				if(!empty($user_exist)) {
+					$user_id = $user_exist;
+					$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists<br>";
 				}
 				else {
-					$user_id = wp_insert_user($user_array);
+					if($type == 'xmluser') { 
+						if($role_val == $ex_user) {
+							$user_id = wp_insert_user($user_array);
+							$this->get_user_id = $user_id;
+							$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists<br>";
+							return false;
+						}
+					}
+					else {
+						$user_id = wp_insert_user($user_array);
+
+					}
+					$current_user = wp_get_current_user();
+					$admin_email = $current_user->user_email;
+					$headers = "From: Administrator <$admin_email>" . "\r\n";
+					$message = "Hi,You've been invited with the role of ".$user_array['role'].". Here, your login details."."\n"."username: ".      $user_array['user_login']."\n"."userpass: ".$user_array['user_pass']."\n"."Please click here to login ".wp_login_url();
+					$emailaddress = $user_array['user_email'];
+					$subject = 'Login Details';
+					if(isset($user_array)){
+						$response = wp_mail($emailaddress, $subject, $message, $headers);
+					}
+					$this->detailedLog[$user_id]['verify_here'] = "<span style ='padding:5px;' > The user - <b> ". $user_array['user_login'] . " </b> - has been created </span><br>";
 
 				}
-				$current_user = wp_get_current_user();
-				$admin_email = $current_user->user_email;
-				$headers = "From: Administrator <$admin_email>" . "\r\n";
-				$message = "Hi,You've been invited with the role of ".$user_array['role'].". Here, your login details."."\n"."username: ".      $user_array['user_login']."\n"."userpass: ".$user_array['user_pass']."\n"."Please click here to login ".wp_login_url();
-				$emailaddress = $user_array['user_email'];
-				$subject = 'Login Details';
-				if(isset($user_array)){
-					$response = wp_mail($emailaddress, $subject, $message, $headers);
+				if($type == 'xmluser') {
+					if($role_val == $ex_user) {
+						return $user_id;
+					}
 				}
-				$this->detailedLog[$user_id]['verify_here'] = "<span style ='padding:5px;' > The user - <b> ". $user_array['user_login'] . " </b> - has been created </span><br>";
+
+				unset($user_array);
+
 
 			}
-			if($type == 'xmluser') {
-				if($role_val == $ex_user) {
-					return $user_id;
-				}
-			}
-
-			unset($user_array);
-
-
-		}
-
 
 	}
 	/**
@@ -671,6 +671,7 @@ class WPAdvImporter_includes_helper {
 		if(is_array($get_details['posts'])) { 
 			$post_arr = $get_details['posts'];
 			$post_data = $post_arr[$currentLimit];
+			if(is_array($post_data)) {
 			foreach($post_data as $post_key => $post_val ) {
                                     
                                 
@@ -699,12 +700,14 @@ class WPAdvImporter_includes_helper {
 				}
 
 				if(isset($post_key) && ($post_key == 'post_type' )) {
-					$ex_type =  $this->to_import(); 
+					$ex_type =  $this->to_import();
+					if(is_array($ex_type)) {
 					if(!in_array($post_val,$ex_type,TRUE)) {
 						return false;
 					}
 					else {
 						$to_post = $this->exclude_list($post_val, $to_post); 
+					}
 					} 
 					if(($duptitle == 'true') || ($dupcontent == 'true') ) {
 						$type = 'title';
@@ -762,6 +765,7 @@ class WPAdvImporter_includes_helper {
 
 				} 
 			}
+			}
 			$post_id =  wp_insert_post($to_post);
 			if( isset($to_post) && $to_post['post_type'] != 'attachement' ) {
 				$cur_prev_ids = $post_id.'|'.$local_post_id;
@@ -788,12 +792,16 @@ class WPAdvImporter_includes_helper {
 						wp_set_object_terms($post_id, $tag_key['slug'], 'post_format'); 
 					}
 
-
-					foreach($tag_key as $term_key => $term_val ) {   } }  
+					if(is_array($tag_key)) {
+						foreach($tag_key as $term_key => $term_val ) {   } 
+					}
+				}  
 			}
 			if($post_val != 'attachment' ) {
-				foreach($postmeta_terms['postmeta'] as $pkey => $pval) {  
-					update_post_meta($post_id, $pval['key'], $pval['value']);         
+				if(is_array($postmeta_terms['postmeta'])) {
+					foreach($postmeta_terms['postmeta'] as $pkey => $pval) {  
+						update_post_meta($post_id, $pval['key'], $pval['value']);         
+					}
 				}
 			}
 			if(isset($postmeta_terms['comments'])) {
@@ -950,8 +958,10 @@ class WPAdvImporter_includes_helper {
 		global $wpdb;
 		$user_table = $wpdb->users;
 		$getUserId = $wpdb->get_results("select ID from $user_table where user_email = '".$user_array["user_email"]."'");
-		$get_ID = $getUserId[0]->ID;
-		return $get_ID;
+		if(!empty($getUserId)) {
+			$get_ID = $getUserId[0]->ID;
+			return $get_ID;
+		}
 	}
 	/**
 	 *Function for get the user id based on user login name

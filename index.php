@@ -2,7 +2,7 @@
 /******************************
   Plugin Name: WP Advanced Importer
   Description: A plugin that helps to import the data's from a XML file.
-  Version: 2.0.2
+  Version: 2.0.3
   Author: smackcoders.com
   Plugin URI: http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html
   Author URI: http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html

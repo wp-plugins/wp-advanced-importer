@@ -123,48 +123,64 @@ function check_allnumeric(inputtxt) {
 
 
 function content_mapping(id)  {
+
 	document.getElementById('module').value = content_mapping;
 	if(id == 'all') {
-		document.getElementById('posts').checked = true;
-		document.getElementById('pages').checked = true;
-		document.getElementById('customposts').checked = true;
+		if(document.getElementById('posts').checked == true)
+			document.getElementById('posts').checked = false;
+		else 
+			document.getElementById('posts').checked = true;
+		if(document.getElementById('pages').checked == true)
+			document.getElementById('pages').checked = false;
+		else
+			document.getElementById('pages').checked = true;
+		if(document.getElementById('customposts').checked == true)
+			document.getElementById('customposts').checked = false;
+		else
+			document.getElementById('customposts').checked = true;	
 	}
 	if(jQuery('#posts').prop('checked')) {
 		var posts =  document.getElementById('posts').value; 
-	} else { var posts = 'NULL'; }
+	} else { 
+		var posts = 'NULL'; 
+	}
 	if(jQuery('#pages').prop('checked')) {
 		var pages = document.getElementById('pages').value;
-	} else { var pages = 'NULL'; }
+	} else { 
+		var pages = 'NULL'; 
+	}
 	if(jQuery('#customposts').prop('checked')) {
 		document.getElementById('edit_mapping').innerHTML = '<option value = "select"> -- select -- </option>';
 		var custom = document.getElementById('customposts').value;
-	} else { var custom = 'NULL'; }
+	} else { 
+		var custom = 'NULL'; 
+	}
 
 	var postdata = new Array( {'post':posts,'page':pages,'custom':custom } );
 	jQuery.ajax({
-        type: 'POST',
-        url: ajaxurl,
-	data: {
-	'action'   : 'choose_post_types',
-	'postdata' : postdata,
-	},
-       success:function(data) {
-       var i = '';
-       var data = JSON.parse(data); 
-       var len = data.length;
-       for(i = 0; i<len; i++) {
-       if( (data[i] != 'attachment') ) {
-       document.getElementById('edit_mapping').innerHTML += '<option value = '+data[i]+'>'+data[i]+'</option>';
-       }
-       }  
-       return false;
+        	type: 'POST',
+        	url: ajaxurl,
+		data: {
+			'action'   : 'choose_post_types',
+			'postdata' : postdata,
+		},
+       		success:function(data) {
+       			var i = '';
+       			var data = JSON.parse(data); 
+       			var len = data.length;
+       			for(i = 0; i<len; i++) {
+       				if( (data[i] != 'attachment') ) {
+       					document.getElementById('edit_mapping').innerHTML += '<option value = '+data[i]+'>'+data[i]+'</option>';
+       				}
+       			}  
+       			return false;
+       		},
 
-       },
-error: function(errorThrown){
-console.log(errorThrown);
-       }
+		error: function(errorThrown) {
+			console.log(errorThrown);
+       		}
 	});
-      }
+}
 
 function check_mapping(id) {
 	var cal = document.getElementsByTagName('input');
@@ -342,36 +358,35 @@ function importRecordsbySettings() {
 
 
 	jQuery.ajax({
-type: 'POST',
-url: ajaxurl,
-data: {
-'action'   : 'importXmlRequest',
-'postdata' : postdata,
-//	    'siteurl'  : siteurl
-},
-success:function(data) {
-if (parseInt(tmpCnt) < parseInt(total) ) {
-currentlimit = parseInt(currentlimit) + parseInt(tmpCnt);
-document.getElementById('currentlimit').value = currentlimit;
-console.log('impLmt: ' + tmpCnt + 'totRecds: ' + total);
-document.getElementById('tmpcnt').value = parseInt(tmpCnt) + 1 ;
-document.getElementById('implimit').value = parseInt(implimit) + 1 ;
-setTimeout(function () { importRecordsbySettings() }, 0);
-}
-else if(parseInt(tmpCnt) == parseInt(total) ){
-document.getElementById('importtype').disabled= true;
-document.getElementById('ajaxloader').style.display="none";
-document.getElementById('log').innerHTML += data+ "<br/>"+"<p style = 'color:green'> Your Import has been Completed . </p>";
-return false;
-}
-document.getElementById('authcnt').value = 0 ;
-document.getElementById('log').innerHTML += data; //+'<br/>';
-
-},
-error: function(errorThrown){
-	       console.log(errorThrown);
-       }
-});
+		type: 'POST',
+		url: ajaxurl,
+		data: {
+			'action'   : 'importXmlRequest',
+			'postdata' : postdata,
+			//	    'siteurl'  : siteurl
+		},
+		success:function(data) {
+			if (parseInt(tmpCnt) < parseInt(total) ) {
+				currentlimit = parseInt(currentlimit) + parseInt(tmpCnt);
+				document.getElementById('currentlimit').value = currentlimit;
+				console.log('impLmt: ' + tmpCnt + 'totRecds: ' + total);
+				document.getElementById('tmpcnt').value = parseInt(tmpCnt) + 1 ;
+				document.getElementById('implimit').value = parseInt(implimit) + 1 ;
+				setTimeout(function () { importRecordsbySettings() }, 0);
+			}
+			else if(parseInt(tmpCnt) == parseInt(total) ){
+				document.getElementById('importtype').disabled= true;
+				document.getElementById('ajaxloader').style.display="none";
+				document.getElementById('log').innerHTML += "<br/>"+"<p style = 'color:green'> Your Import has been Completed . </p>";
+				return false;
+			}
+			document.getElementById('authcnt').value = 0 ;
+			document.getElementById('log').innerHTML += data;
+		},
+		error: function(errorThrown){
+	       		console.log(errorThrown);
+       		}
+	});
 }
 
 

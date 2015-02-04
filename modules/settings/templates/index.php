@@ -28,11 +28,11 @@
                         <?php $loaders_extensions = get_loaded_extensions();
                               $mod_security = apache_get_modules();
                        ?>
-                        <tr><td>IonCube Loader </td><td><?php if(in_array('ionCube Loader', $loaders_extensions)) {
+                        <!--<tr><td>IonCube Loader </td><td><?php if(in_array('ionCube Loader', $loaders_extensions)) {
                                         echo '<label style="color:green;">Yes</label>';
                                 } else {
                                         echo '<label style="color:red;">No</label>';
-                                } ?> </td><td></td></tr>
+                                } ?> </td><td></td></tr>-->
 			<tr><td>PDO </td><td><?php if(in_array('PDO', $loaders_extensions)) {
                                         echo '<label style="color:green;">Yes</label>';
                                 } else {

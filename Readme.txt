@@ -4,8 +4,8 @@ Donate link: http://www.smackcoders.com/donate.html
 Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, restore
 Requires at least: 3.8
 Tested up to: 4.1
-Stable tag: 2.0.2
-Version: 2.0.2
+Stable tag: 2.0.3
+Version: 2.0.3
 Author: smackcoders
 Author URI: http://profiles.wordpress.org/smackcoders/
 License: GPLv2 or later
@@ -54,6 +54,11 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 
 
 == Changelog ==
+
+= 2.0.3 =
+* Fixed warnings 
+* Issues fixed for image import
+
 = 2.0.2 =
 * Added: WordPress 4.1 compatibility checked.
 * Fixed: Importing images related issues.
@@ -87,6 +92,10 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 * Initial release version. Tested and found works well without any issues.
 
 == Upgrade Notice ==
+
+= 2.0.3 =
+* Upgrade now for bug fixes
+
 = 2.0.2 =
 * Upgrade now for issue fixes and 4.1 compatibility
 
