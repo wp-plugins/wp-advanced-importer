@@ -2,7 +2,7 @@ jQuery(document).ready( function() {
 		document.getElementById('log').innerHTML = '<p style="margin:15px;color:red;">NO LOGS YET NOW.</p>';
 		var current_module =  document.getElementById('current_step').value;
 		if(current_module == 'content_mapping') {
-		content_mapping();
+		content_mapping('all');
 		}
 
 		});
@@ -237,6 +237,10 @@ data: {
 'postdata' : postdata,
 },
 success:function(data) {
+
+ jQuery('#SaveMsg').css("display","");
+ jQuery('#SaveMsg').delay(2000).fadeOut();
+
 return false;
 },
 error: function(errorThrown){

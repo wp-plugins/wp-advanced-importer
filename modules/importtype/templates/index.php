@@ -18,7 +18,7 @@ global $wpdb;
 	<tr>
 	<td>
 	<div class="steplist">
-	<h3 style="width:15%"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='uploadfile') {?> class= "selected" <?php } ?> style="height:29px"><p style="margin-left:17px;margin-top:4px">Import XML File</p></label></h3><h3 style="width:15%;margin-left:141px;margin-top:-40px"> <label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='user_mapping') {?> class= "selectuser" <?php } ?>><p style="margin-left:24px;margin-top:4px">User Mapping</p></label></h3><h3 style="width:15%;margin-left:282px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='content_mapping') {?> class= "contentselect" <?php } ?>><p style="margin-left:18px;margin-top:4px">Content Mapping</p></label></h3><h3 style="width:14%;margin-left:434px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='media_handle') {?> class= "contentselect" <?php } ?>><p style="margin-left:15px;margin-top:4px">Media Handling</p></label></h3><h3 style="width:16%;margin-left:575px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='import_option') {?> class= "contentselect" <?php } ?>><p style="margin-left:23px;margin-top:4px;-webkit-margin-start: 12px;">Import Option</p></label></h3><h3 style="width:34%;;float:right;margin-top:-40px;height:30px;"></h3>
+	<h3 style="width:15%"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='uploadfile') {?> class= "selected" <?php } ?> style="height:29px"><p style="margin-left:17px;margin-top:4px">Import XML File</p></label></h3><h3 style="width:15%;margin-left:141px;margin-top:-40px"> <label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='user_mapping') {?> class= "selectuser" <?php } ?>><p style="margin-left:24px;margin-top:4px">User Mapping</p></label></h3><h3 style="width:15%;margin-left:282px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='content_mapping') {?> class= "contentselect" <?php } ?>><p style="margin-left:18px;margin-top:4px">Content Mapping</p></label></h3><h3 style="width:14%;margin-left:434px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='media_handle') {?> class= "contentselect" <?php } ?>><p style="margin-left:15px;margin-top:4px">Media Handling</p></label></h3><h3 style="width:16%;margin-left:575px;margin-top:-40px;"><label <?php if(isset($_REQUEST['step']) &&$_REQUEST['step'] =='import_option') {?> class= "contentselect" <?php } ?>><p style="margin-left:23px;margin-top:4px;-webkit-margin-start: 12px;">Import Option</p></label></h3><h3 style="width:39%;;float:right;margin-top:-40px;height:30px;"></h3>
 	</div>
 	<div id='sec-one' <?php if(isset($_REQUEST['step']) && $_REQUEST['step'] != 'uploadfile') {?> style='display:none' <?php } ?>>
 	<?php if(is_dir($impCE->getUploadDirectory('default'))){ ?>
@@ -205,7 +205,7 @@ global $wpdb;
         <div style="margin-left:15px;margin-top:15px;">
              <div>
 			<label class="textalign" style="margin-bottom:12px">Content Mapping :</label>
-                        <div class="squarecheck"><input type ="checkbox" name = "all" id = "all" value = "all"   onclick ="content_mapping(this.id);"><label for = "all"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px"> Check All</label>
+                      <!--  <div class="squarecheck"><input type ="checkbox" name = "all" id = "all" value = "all"   onclick ="content_mapping(this.id);"><label for = "all"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px"> Check All</label>  -->
                         <div class="squarecheck"><input type ="checkbox" name = "contentmap" id = "posts" value = "post"   onclick ="content_mapping(this.id);"><label for = "posts"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">Post</label>
               <div class="squarecheck"><input type ="checkbox" name = "contentmap" id = "pages" value = "page" onclick ="content_mapping(this.id);" /><label for="pages"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">Page</label>
               <div class="squarecheck"><input type ="checkbox" name = "contentmap" id = "customposts" value = "customposts" onclick ="content_mapping(this.id);" /><label for="customposts"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">Custom Posts</label>
@@ -216,7 +216,7 @@ global $wpdb;
                       </select>
             </div>
             <div id = 'view'>  </div> 
-            <input type = 'submit' name = 'cont_map' id = 'cont_map'  value = "Next >>" class = "btn btn-primary " style="float:right;margin-right:50px;margin-top:-50px;"/>
+            <input type = 'submit' name = 'cont_map' id = 'cont_map'  value = "Next >>" class = "btn btn-primary " style="float:right;margin-right:50px;margin-top:-60px;"/>
        </div>
        </div>
         <?php } ?>

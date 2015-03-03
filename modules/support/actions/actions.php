@@ -18,7 +18,9 @@ class SupportActions extends SkinnyActions {
     public function executeIndex($request)
     {
         // return an array of name value pairs to send data to the template
-	require_once (ABSPATH . 'wp-load.php');
+#	require_once (ABSPATH . 'wp-load.php');
+        $parse_uri = explode( 'wp-content', $_SERVER['SCRIPT_FILENAME'] );
+        require_once( ABSPATH.'wp-load.php' );
         $data = array();
 	$headers = array();
 	if(isset($_POST['send_mail'])){

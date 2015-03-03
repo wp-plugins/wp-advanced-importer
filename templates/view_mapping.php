@@ -19,6 +19,8 @@ function edit_mapping($post_type) {
 	$html .= '<a href="#" id = "checkall" onclick = "check_mapping(this.id);"> Check All </a>/';
 	$html .= '<a href="#" id = "uncheckall" onclick = "uncheck_mapping(this.id);">Uncheck All </a>';
 
+        $html .= '<div id="SaveMsg" class="alert" style="display:none;"><p id="warningmsg" class="alert-success" style="font-size:130%">Mapping Saved</p></div>';
+
 	$html .= '<form action ="" id = "mapping_fields"  />';
 	$html .= '<input type = "hidden" name = "save_type"  id = "save_type" value ='.$module.'>';
 	$html .= '<table style="width:80%;margin:15px 0px 25px 52px;"> <tr style="height:38px"><td class="left_align textalign" style="width:161px">  Check/Uncheck  </td><td class="textalign" style="width:161px;"> XML FIELDS </td><td class="textalign"> WP FIELDS  </td></tr>';   $headers['post_tag'] = 'post_tag';
