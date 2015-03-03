@@ -41,11 +41,11 @@ For guides and tutorials, visit http://www.smackcoders.com .
 
 == Screenshots ==
 
-1.Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc.
-2.Advanced user mapping allows to assign any desired user or create new user.
-3.Advanced content mapping, user can selectively import their posts attributes and edit mapping.
-4.Advanced Media Handling with url and zip upload.
-5.Advanced duplicate post name and content check with server request control for high performance factor.
+1. Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc. 
+2. Advanced user mapping allows to assign any desired user or create new user. 
+3. Advanced content mapping, user can selectively import their posts attributes and edit mapping. 
+4. Advanced Media Handling with url and zip upload. 
+5. Advanced duplicate post name and content check with server request control for high performance factor. 
 
 == Frequently Asked Questions ==
 
