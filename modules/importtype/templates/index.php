@@ -255,7 +255,7 @@ global $wpdb;
           <div id='sec-five' <?php if($_REQUEST['step']!= 'import_option'){ ?> style='display:none;' <?php } ?> >
           <?php
 
-               if($_POST['attachment'] == 'dwld_local') {  
+               if(isset($_POST['attachment']) && $_POST['attachment'] == 'dwld_local') {  
               if(isset($_FILES['adv_media'])) {
                $uploaded_compressedFile = $_FILES['adv_media']['tmp_name'];
                $get_basename_zipfile    = explode('.', $_FILES['adv_media']['name']);
@@ -285,7 +285,7 @@ global $wpdb;
                                         
                                     }                        
 } ?>
-                 <input type = "hidden" name = "attach" id = "attach" value = "<?php echo $value; ?>" >
+                 <input type = "hidden" name = "attach" id = "attach" value = "<?php if(isset($value)){echo $value; }?>" >
                   <?php if(isset($_SESSION['xml_values'])) {     $file_name = $_SESSION['xml_values']['uploadfilename'];
                                                                  $total     = $_SESSION['xml_values']['total'];
                                                                  $auth_cnt  = $_SESSION['xml_values']['authcnt'];

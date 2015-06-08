@@ -1,4 +1,4 @@
-<?php global $wpdb; ?>
+<?php global $wpdb; global $wp_version;?>
  <div id="section8" class="securityperformance" style="display:block;">
                         <div id="data" class="databorder security-perfoemance" >
 			<table class="table table-striped">

@@ -4,8 +4,8 @@ Donate link: http://www.smackcoders.com/donate.html
 Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, restore
 Requires at least: 3.8
 Tested up to: 4.1.1
-Stable tag: 2.0.4
-Version: 2.0.4
+Stable tag: 2.0.5
+Version: 2.0.5
 Author: smackcoders
 Author URI: http://profiles.wordpress.org/smackcoders/
 License: GPLv2 or later
@@ -41,11 +41,11 @@ For guides and tutorials, visit http://www.smackcoders.com .
 
 == Screenshots ==
 
-1. Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc. 
-2. Advanced user mapping allows to assign any desired user or create new user. 
-3. Advanced content mapping, user can selectively import their posts attributes and edit mapping. 
-4. Advanced Media Handling with url and zip upload. 
-5. Advanced duplicate post name and content check with server request control for high performance factor. 
+1.Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc.
+2.Advanced user mapping allows to assign any desired user or create new user.
+3.Advanced content mapping, user can selectively import their posts attributes and edit mapping.
+4.Advanced Media Handling with url and zip upload.
+5.Advanced duplicate post name and content check with server request control for high performance factor.
 
 == Frequently Asked Questions ==
 
@@ -54,6 +54,11 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 
 
 == Changelog ==
+= 2.0.5 =
+* Fixed: Reported forum bugs.
+* Fixed: warnings fixed
+* Added: Wordpress 4.2.2 Compatibility checked.
+
 = 2.0.4 =
 * Fixed: Reported forum bugs.
 * Added: Wordpress 4.1.1 Compatibility checked.
@@ -91,6 +96,9 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 * Initial release version. Tested and found works well without any issues.
 
 == Upgrade Notice ==
+= 2.0.5 =
+* Upgrade now for issue fixes and 4.2.2 compatibility
+
 = 2.0.4 =
 * Upgrade now for issue fixes and 4.1.1 compatibility
 

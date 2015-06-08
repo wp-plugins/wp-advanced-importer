@@ -156,17 +156,17 @@ class WPAdvImporter_includes_helper {
 			return $_SESSION['user_imp_type'];                
 		}
 		else if($user_imp_type == 'adv') {
-			if($sel_user['user'] == 'xmluser') {
+			if(isset($sel_user['user']) && $sel_user['user'] == 'xmluser') {
 				$_SESSION['user_imp_type'] = 'xmluser';           
 				$_SESSION['user'] = $sel_user['xml_author']; 
 				return $_SESSION['user']; 
 			}
-			else if($sel_user['user'] == 'siteuser') {
+			else if(isset($sel_user['user']) && $sel_user['user'] == 'siteuser') {
 				$_SESSION['user_imp_type'] = 'siteuser';           
 				$_SESSION['user'] = $sel_user['ex_user'];  
 				return $_SESSION['user'];   
 			}
-			else if($sel_user['user'] == 'emailuser') {
+			else if(isset($sel_user['user']) && $sel_user['user'] == 'emailuser') {
 				$new_user_name = $sel_user['new_user_name'];
 				$email         = $sel_user['new_user'];
 				$new_user = $new_user_name.'|'.$email;
