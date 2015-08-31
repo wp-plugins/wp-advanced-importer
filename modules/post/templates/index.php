@@ -1,4 +1,6 @@
 <?php
+echo "<pre>";
+echo(ABSPATH);
 /* Module : Post
    Author : Fredrick
    Owner  : smackcoders.com
@@ -78,47 +80,94 @@ $impCE = new WPAdvImporter_includes_helper();
 		$('#progress .progress-bar').css('visibility','hidden');
 	}
 	else{
-	$(function () {
-		'use strict';
-		var uploadPath = document.getElementById('uploaddir').value;
-		var url = (document.getElementById('pluginurl').value+'/plugins/<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/templates/uploader.php')+'?uploadPath='+uploadPath+'&curr_action=<?php echo $_REQUEST['__module']; ?>';
-		$('#fileupload').fileupload({
-		url: url,
-		dataType: 'json',
-		done: function (e, data) {
-		$.each(data.result.files, function (index, file) {
-		document.getElementById('uploadFileName').value=file.name;
-                var filewithmodule = file.uploadedname.split(".xml");
-                file.uploadedname = filewithmodule[0]+"-<?php echo $_REQUEST['__module']; ?>"+".xml";
+		
+
+ var url = (document.getElementById('pluginurl').value+'/plugins/<?php echo  WP_CONST_ADVANCED_XML_IMP_SLUG;?>/modules/default/templates/index.php');
+
+		
+var filesdata;
+                var uploadPath = document.getElementById('uploaddir').value;
+
+            
+ function prepareUpload(event)
+{
+                      filesdata = event.target.files;  
+                        var curraction = '<?php echo $_REQUEST['__module']; ?>';     
+                        var frmdata = new FormData();                                            
+                        var uploadfile_data = jQuery('#fileupload').prop('files')[0];   
+                        frmdata.append('files', uploadfile_data);
+                        frmdata.append('action','uploadfilehandle');
+                        frmdata.append('curr_action', curraction);
+                        frmdata.append('uploadPath', uploadPath);             
+                        jQuery.ajax({
+                                url : ajaxurl,
+                                type : 'post',
+                                data : frmdata,
+                                cache: false,
+                                contentType : false,
+                                processData: false,
+                                success : function(data) {           
+
+                                        var fileobj = JSON.parse(data);               
+ 
+                                       $.each(fileobj, function (objkey,objvalue) {         
+                                          $.each(objvalue, function (o_key,file) {          
+
+
+                                                 document.getElementById('uploadFileName').value=file.name;
+                var filewithmodule = file.uploadedname.split(".xml");		
+		file.uploadedname = filewithmodule[0]+"-<?php echo isset($_REQUEST['__module']) ? $_REQUEST['__module'] : ''; ?>"+".xml";
                 document.getElementById('upload_csv_realname').value = file.uploadedname; 
-                var get_version1 = file.name.split("-<?php echo $_REQUEST['__module']; ?>"); 
+                var get_version1 = file.name.split("-<?php echo isset($_REQUEST['__module']) ? $_REQUEST['__module'] : ''; ?>"); 
                 var get_version2 = get_version1[1].split(".xml");
                 var get_version3 = get_version2[0].split("-");
                 document.getElementById('current_file_version').value = get_version3[1];
-		$('#uploadedfilename').val(file.uploadedname);
-		$( "#filenamedisplay" ).empty();
-		if(file.size>1024 && file.size<(1024*1024))
-		{
-			var fileSize =(file.size/1024).toFixed(2)+' kb';
-		}
-		else if(file.size>(1024*1024))
-		{
-			var fileSize =(file.size/(1024*1024)).toFixed(2)+' mb';
-		}
-		else
-		{
-			var fileSize= (file.size)+' byte';
-		}
-		$('<p/>').text((file.name)+' - '+fileSize).appendTo('#filenamedisplay');
-		$('#importfile').attr('disabled', false);
-		});
-		},progressall: function (e, data) {
-		var progress = parseInt(data.loaded / data.total * 100, 10);
-		$('#progress .progress-bar').css('width', progress + '%' );
-		}
-		}).prop('disabled', !$.support.fileInput)
-		.parent().addClass($.support.fileInput ? undefined : 'disabled');
-		});
+                $('#uploadedfilename').val(file.uploadedname);
+                $( "#filenamedisplay" ).empty();
+                if(file.size>1024 && file.size<(1024*1024))
+                {
+                        var fileSize =(file.size/1024).toFixed(2)+' kb';
+                }
+                else if(file.size>(1024*1024))
+                {
+                        var fileSize =(file.size/(1024*1024)).toFixed(2)+' mb';
+                }
+                else
+                {
+                        var fileSize= (file.size)+' byte';
+                }
+                $('<p/>').text((file.name)+' - '+fileSize).appendTo('#filenamedisplay');
+                $('#importfile').attr('disabled', false);
+                jQuery('#fileupload').prop('disabled', !jQuery.support.fileInput)
+                 .parent().addClass(jQuery.support.fileInput ? undefined : 'disabled');
+
+                            
+
+
+
+                            
+                                                         
+                                                         });
+                                                     });
+ 
+}
+  
+});
+
+                         
+}   
+
+jQuery('#fileupload').on('change', prepareUpload);	
+jQuery('#fileupload').fileupload({
+                url : url,
+                progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                jQuery('#progress .progress-bar').css('width', progress + '%' );
+                }
+        });
+
+
+  
 	}
 	</script>
 	<input type = 'hidden' name = 'importid' id = 'importid' >
@@ -134,7 +183,7 @@ $impCE = new WPAdvImporter_includes_helper();
 	</tr>
 	<tr>
 	<td>
-	<form name='mappingConfig' action="<?php echo admin_url(); ?>admin.php?page=<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/index.php&__module=<?php echo $_REQUEST['__module']?>&step=importoptions"  method="post" onsubmit="return import_csv();" >
+	<form name='mappingConfig' action="<?php echo admin_url(); ?>admin.php?page=<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/index.php&__module=<?php echo $_REQUEST['__module']?>&step=importoptions"  method="post" >
 	<div class='msg' id = 'showMsg' style = 'display:none;'></div>
 	<?php $_SESSION['SMACK_MAPPING_SETTINGS_VALUES'] = $_POST;
 	if (isset($_POST['mydelimeter'])) {	
@@ -168,7 +217,7 @@ $impCE = new WPAdvImporter_includes_helper();
 			<span class="tooltipCustompost">
 			<img class="callout" src="<?php echo WP_CONST_ADVANCED_XML_IMP_DIR; ?>images/callout.gif" />
 			<strong>Select your custompost type</strong>
-			<img src="<?php echo WP_CONST_ADVANCED_XML_IMP_DIR; ?>images/help.png" style="margin-top: 6px;float:right;" />
+			<img src="<?php echo WP_CONST_ADVANCED_XML_IMP_DIR; ?>images/hdmin.php?page=wp-advanced-importer%2Findex.php&__module=importtype&step=media_handlenelp.png" style="margin-top: 6px;float:right;" />
 			</span>
 			</a>
 			</div>
@@ -300,11 +349,11 @@ $impCE = new WPAdvImporter_includes_helper();
 					<input class="customfieldtext" type="text" id="textbox<?php print($count); ?>" name="textbox<?php print($count); ?>" TITLE="Replace the default value" style="display: none;float:left;width:160px;" value="<?php echo $value ?>"/>
 					<span style="display: none;float:left" id="customspan<?php echo $count ?>">
 					<a href="#" class="tooltip">
-					<img src="../wp-content/plugins/<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/images/help.png" />
+					<img src="<?php echo WP_PLUGIN_URL;?>/<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/images/help.png" />
 					<span class="tooltipPostStatus">
-					<img class="callout" src="../wp-content/plugins/<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/images/callout.gif" />
+					<img class="callout" src="<?php echo WP_PLUGIN_URL;?>/<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/images/callout.gif" />
 					<strong>Give a name for your new custom field</strong>
-					<img src="../wp-content/plugins/<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/images/help.png" style="margin-top: 6px;float:right;" />
+					<img src="<?php echo WP_PLUGIN_URL;?>/<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/images/help.png" style="margin-top: 6px;float:right;" />
 					</span>
 					</a> 
 					</span>

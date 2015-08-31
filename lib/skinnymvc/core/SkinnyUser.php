@@ -1,4 +1,9 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
 /******************************
  * filename:    SkinnyUser.php
  * description: Holds session stuff

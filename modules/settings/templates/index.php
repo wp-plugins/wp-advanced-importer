@@ -1,4 +1,11 @@
-<?php global $wpdb; global $wp_version;?>
+<?php 
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
+global $wpdb; global $wp_version;?>
  <div id="section8" class="securityperformance" style="display:block;">
                         <div id="data" class="databorder security-perfoemance" >
 			<table class="table table-striped">
@@ -72,6 +79,7 @@
                         <tr><td class='debug-info-name'>WPDB Prefix</td><td><?php echo $wpdb->prefix; ?></td><td></td></tr>
                         <tr><td class='debug-info-name'>WP Multisite Mode</td><td><?php if ( is_multisite() ) { echo '<label style="color:green;">Enabled</label>'; } else { echo '<label style="color:red;">Disabled</label>'; } ?> </td><td></td></tr>
                         <tr><td class='debug-info-name'>WP Memory Limit</td><td><?php echo (int) ini_get('memory_limit'); ?></td><td></td></tr>
+  <input type="hidden" id="log" name="log" />
                         </table>
                         </div>
                 </div> 

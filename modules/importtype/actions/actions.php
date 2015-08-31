@@ -1,4 +1,10 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
 /******************************
  * filename:    modules/post/actions/actions.php
  * description:

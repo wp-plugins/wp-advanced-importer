@@ -2,6 +2,12 @@
 <style> #ui-datepicker-div { display:none } </style>
 <div id = 'notification_wp_csv'> </div>
 <?php
+
+	if(!defined('ABSPATH'))
+	{	
+        die('Exit if accessed directly');
+	}
+
  	$impCEM = CallWPAdvImporterObj::getInstance();
      	$impCEM->renderMenu();
 	if(isset($_REQUEST['action'])){

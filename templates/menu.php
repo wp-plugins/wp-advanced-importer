@@ -1,4 +1,10 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
 $post = $page = $custompost = $categories = $users = $customtaxonomy = $comments = $eshop = $wpcommerce = $woocommerce = $settings = $support = $dashboard = $export = $mappingtemplate = $filemanager = $schedulemapping = '';
 $impCEM = CallWPAdvImporterObj::getInstance();
 $settings = $impCEM->getSettings();

@@ -1,4 +1,11 @@
 <?php
+
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
 /*
  * jQuery File Upload Plugin PHP Example 5.14
  * https://github.com/blueimp/jQuery-File-Upload
@@ -10,7 +17,7 @@
  * http://www.opensource.org/licenses/MIT
  */
 
-error_reporting(E_ALL | E_STRICT);
+//error_reporting(E_ALL | E_STRICT);
 require('UploadHandler.php');
 $current_user = wp_get_current_user();
 if(is_multisite()) {

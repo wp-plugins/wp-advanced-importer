@@ -1,4 +1,9 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
 require_once(WP_CONST_ADVANCED_XML_IMP_DIRECTORY.'lib/skinnymvc/core/base/SkinnyBaseActions.php');
 require_once(WP_CONST_ADVANCED_XML_IMP_DIRECTORY.'lib/skinnymvc/core/SkinnyActions.php');
 $skinnyObj = new CallWPAdvImporterObj();
@@ -10,24 +15,24 @@ $authorcount =  $_POST['postdata'][0]['authorcount'];
 $total       =  $_POST['postdata'][0]['total'];
 $ex_user     =  $_POST['postdata'][0]['ex_user'];
 $authcnt     =  $_POST['postdata'][0]['authcnt'];
-$implimit    =  $_POST['postdata'][0]['implimit'];
-$attach      =  $_POST['postdata'][0]['attach'];
-$duptitle    =  $_POST['postdata'][0]['duptitle'];
+$implimit    =  $_POST['postdata'][0]['implimit'];  
+$attach      =  $_POST['postdata'][0]['attach'];                  
+$duptitle    =  $_POST['postdata'][0]['duptitle'];       
 $dupcontent  =  $_POST['postdata'][0]['dupcontent'];
 $type        =  $_POST['postdata'][0]['type'];
 $get_file = trim($get_file);
-$attach   = trim($attach);
+$attach   = trim($attach);                                             
 
-$all_arr = $skinnyObj->get_xml_details($get_file);
-for($j=1; $j<=$authcnt; $j++) {
-$user_id  =  $skinnyObj->processAuthor($all_arr , $j , $type , $ex_user);
+$all_arr = $skinnyObj->get_xml_details($get_file);                    
+for($j=1; $j<=$authcnt; $j++) {                                                       
+$user_id  =  $skinnyObj->processAuthor($all_arr , $j , $type , $ex_user);     
   foreach($skinnyObj->detailedLog as $logKey => $logVal) {
                                 echo " </p>" . $logVal['verify_here'] . "</p>";
                                 unset($skinnyObj->detailedLog[$logKey]); 
          }
 }
-$user_id = $skinnyObj->get_user_id;
-$res = $skinnyObj->processDataInWP($all_arr,$implimit,$user_id,$attach,$duptitle,$dupcontent,$type);
+$user_id = $skinnyObj->get_user_id;     
+$res = $skinnyObj->processDataInWP($all_arr,$implimit,$user_id,$attach,$duptitle,$dupcontent,$type);   
 foreach($skinnyObj->detailedLog as $logKey => $logVal) {
                            print_r  ("</p>" . $logVal['verify_here'] . "</p>");
                         }

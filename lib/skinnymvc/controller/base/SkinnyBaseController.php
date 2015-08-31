@@ -1,4 +1,10 @@
 <?php
+
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
 /******************************
  * filename:    SkinnyBaseController.php
  * description: The main application controller. Every request goes through here.

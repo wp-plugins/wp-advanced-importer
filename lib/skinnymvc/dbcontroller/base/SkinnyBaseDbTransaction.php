@@ -1,4 +1,9 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
 /**
  * filename:    SkinnyBaseDbTransaction.php
  * description: Database Transaction class

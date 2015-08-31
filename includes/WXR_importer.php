@@ -1,5 +1,11 @@
 <?php
 
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
 /**
  * WordPress Importer class for managing parsing of WXR files.
  */

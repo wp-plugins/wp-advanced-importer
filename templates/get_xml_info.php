@@ -1,4 +1,10 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
 $res = $user_array = $postmeta_terms =  array(); 
 $post_count = $page_count = $custom_count  = $total_rec = $tag_name = ''; 
 $file_name = $_POST['postdata'][0]['xml_name'];

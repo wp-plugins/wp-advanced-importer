@@ -1,4 +1,11 @@
 <?php
+
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
 /*
  * jQuery File Upload Plugin PHP Class 7.0.1
  * https://github.com/blueimp/jQuery-File-Upload
@@ -9,11 +16,18 @@
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/MIT
  */
+
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
 //require_once('view.php');
-#require_once ("../../../../../wp-load.php");
-$parse_uri = explode( 'wp-content', $_SERVER['SCRIPT_FILENAME'] );
-require_once( $parse_uri[0] . 'wp-load.php' );
-require_once ("../../includes/WPAdvImporter_includes_helper.php");
+//require_once ("../../../../../wp-load.php");
+//$parse_uri = explode( 'wp-content', $_SERVER['SCRIPT_FILENAME'] );
+//require_once( $parse_uri[0] . 'wp-load.php' );
+//require_once ("../../includes/WPAdvImporter_includes_helper.php");
 class UploadHandler
 {
 
@@ -1038,14 +1052,14 @@ class UploadHandler
              $post_url = admin_url() . 'admin.php?page=' .WP_CONST_ADVANCED_XML_IMP_SLUG. '/index.php&__module=' . $_POST['current_module'] . '&step=uploadfile';
 	//	if($post_url != $_SERVER['HTTP_REFERER'])
 	//		die('Your requested url were wrong! Please contact your admin.');
-	if($_SERVER['HTTP_REFERER'] != urldecode($_SERVER['HTTP_REFERER'])){
+/*	if($_SERVER['HTTP_REFERER'] != urldecode($_SERVER['HTTP_REFERER'])){
 	       if($post_url != urldecode($_SERVER['HTTP_REFERER']))
 		die('Your requested url were wrong! Please contact your admin.');
 	}
 	else {
 	       if($post_url != $_SERVER['HTTP_REFERER'] )
 		die('Your requested url were wrong! Please contact your admin.');
-	}
+	}*/
         $file = new stdClass();
         $file->name = $this->get_file_name($name, $type, $index, $content_range);
         $file->size = $this->fix_integer_overflow(intval($size));
@@ -1341,7 +1355,7 @@ class UploadHandler
             );
         }
 	# code added by goku to get the uploaded filename
-	$files[0]->uploadedname = $upload['name'][0];
+	$files[0]->uploadedname = $upload['name'];
         return $this->generate_response(
             array($this->options['param_name'] => $files),
             $print_response

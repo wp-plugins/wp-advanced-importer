@@ -2,11 +2,10 @@
 global $wpdb;
 $post        = $page = $custom =  $file = '';
 $get_details = $get_custom_info = $res =  $eliminate = $default = array() ;
-$eliminate   
-= (array)('attachmant');
+$eliminate   = (array)('attachmant');                                            
 $default[]   = $_POST['postdata'][0]['post'];
-$default[]   = $_POST['postdata'][0]['page'];
-$custom      = $_POST['postdata'][0]['custom'];
+$default[]   = $_POST['postdata'][0]['page'];             
+$custom      = $_POST['postdata'][0]['custom'];    
 if(!empty($custom) && $custom == 'customposts') {
 	$file = $_SESSION['xml_values']['uploadfilename'];
 	$impCE = new WPAdvImporter_includes_helper();
@@ -27,11 +26,12 @@ if(!empty($custom) && $custom == 'customposts') {
 
 		}
 	}
-	$res[] = $_POST['postdata'][0]['post'];
-	$res[] = $_POST['postdata'][0]['page'];
-	update_option('to_import',$res);
 }
 
+	$res[] = $_POST['postdata'][0]['post'];
+	$res[] = $_POST['postdata'][0]['page'];   
+$res[] = $_POST['postdata'][0]['custom'];                              
+	update_option('to_import',$res);
 
 print_r(json_encode($res));die; 
 

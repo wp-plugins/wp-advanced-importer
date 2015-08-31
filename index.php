@@ -1,9 +1,14 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
 /******************************
   Plugin Name: WP Advanced Importer
   Description: A plugin that helps to import the data's from a XML file.
   Version: 2.0.5
-  Author: smackcoders.com
+mportRecordsbySettings(  Author: smackcoders.com
   Plugin URI: http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html
   Author URI: http://www.smackcoders.com/wp-ultimate-csv-importer-pro.html
  * filename: index.php
@@ -159,6 +164,12 @@ function WPAdvImpStartSession() {
 		session_start();
 	}
 }
+
+function uploadfilehandle() {
+        require_once("lib/jquery-plugins/uploader.php");
+        die();
+}
+add_action('wp_ajax_uploadfilehandle','uploadfilehandle');
 
 function WPAdvImpEndSession() {
 	session_destroy ();

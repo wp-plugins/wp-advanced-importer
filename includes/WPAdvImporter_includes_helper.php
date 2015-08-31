@@ -1,4 +1,9 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
 /******************************
  * Filename	: includes/WPAdvImporter_includes_helper.php
  * Description	: Helper class for WP Advanced Importer
@@ -488,7 +493,7 @@ class WPAdvImporter_includes_helper {
 	public function exclude_list($post_type,$post_arr) {
 		global $wpdb;
 		$exclusion_list = array();
-		$exclusion_list = get_option('exclude_keys');
+		$exclusion_list = get_option('exclude_keys');                    
 		if(!empty($exclusion_list) && is_array($exclusion_list)) {
 			if(array_key_exists($post_type,$exclusion_list)) {
 				foreach($exclusion_list as $post_key) {
@@ -505,19 +510,19 @@ class WPAdvImporter_includes_helper {
 	 *@param attachment path as url
 	 *@param image url
 	 **/
-	public function get_img_from_zip($attach_url) {
+	public function get_img_from_zip($attach_url) {        
 		$zip_location = $file_url = '';
-		$get_base_name= @basename($attach_url);
-		$zip_location = $_SESSION['img_path'];
-		$url_location = $_SESSION['img_path_url'];
-		$files_array  = $this->wp_adv_importer_fetch_all_files($zip_location);              
+		$get_base_name= @basename($attach_url);       
+		$zip_location = $_SESSION['img_path'];  
+		$url_location = $_SESSION['img_path_url'];   
+		$files_array  = $this->wp_adv_importer_fetch_all_files($zip_location);         
 		foreach($files_array as $singleFile)      {
-			$get_file_name = explode('/',$singleFile);
-			$c = count($get_file_name);
+			$get_file_name = explode('/',$singleFile);      
+			$c = count($get_file_name);                 
 			$temp_file_name = $get_file_name[$c - 1];
 			$temp_file_month = $get_file_name[$c - 2];
 			$temp_file_year  = $get_file_name[$c - 3];
-			//   $temp_file_uploads = $get_file_name[$c - 4];
+			//   $temp_file_uploads = $get_file_name[$c - 4]; 
 			if($temp_file_name == $get_base_name) {
 				if( (is_numeric($temp_file_year)) && (is_numeric($temp_file_month)) ) {
 					$file_url = $url_location .'/'.$temp_file_year .'/'.$temp_file_month.'/'.$temp_file_name;
@@ -538,20 +543,22 @@ class WPAdvImporter_includes_helper {
 	 *@param available file with path
 	 **/
 	public function wp_adv_importer_fetch_all_files($dir)  { 
-		$root = scandir($dir); 
+
+		$directory=rtrim($dir,"/");          
+		$root = scandir($directory); 
 		foreach($root as $value) 
 		{ 
 			if($value === '.' || $value === '..') 
 				continue;
 
-			if(is_file("$dir/$value"))	{
-				$files[] = "$dir/$value";continue;
+			if(is_file("$directory/$value"))	{
+				$files[] = "$directory/$value";continue;
 			}
-			foreach($this->wp_adv_importer_fetch_all_files("$dir/$value") as $value) 
+			foreach($this->wp_adv_importer_fetch_all_files("$directory/$value") as $value) 
 			{ 
-				$files[] = $value; 
+				$files[] = $value;       
 			} 
-		} 
+		}
 		return $files; 
 	}
 	/**
@@ -559,9 +566,9 @@ class WPAdvImporter_includes_helper {
 	 *@param post_array,current limit,auth_type,selected user from user mapping
 	 *@param return user_id
 	 **/
-	public function processAuthor($get_details , $currentLimit ,$type ,$ex_user) {
+	public function processAuthor($get_details , $currentLimit ,$type ,$ex_user) {      
 		$user_array = array();
-		$new_user = '';
+		$new_user = '';                                         
 		if($type == 'siteuser') {
 			return $ex_user;
 		}
@@ -619,16 +626,16 @@ class WPAdvImporter_includes_helper {
 					$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists<br>";
 				}
 				else {
-					if($type == 'xmluser') { 
+					if($type == 'xmluser') {                                     
 						if($role_val == $ex_user) {
 							$user_id = wp_insert_user($user_array);
 							$this->get_user_id = $user_id;
-							$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists<br>";
-							return false;
+						//	$this->detailedLog[$user_id]['verify_here'] = " The user - </b> ". $user_array['user_login'] . " -  </b> is already exists<br>";
+						//	return false;
 						}
 					}
 					else {
-						$user_id = wp_insert_user($user_array);
+						$user_id = wp_insert_user($user_array);  
 
 					}
 					$current_user = wp_get_current_user();
@@ -660,14 +667,13 @@ class WPAdvImporter_includes_helper {
 	 *
 	 * @return post_id
 	 */
-	function processDataInWP($get_details,$currentLimit,$user = null,$img,$duptitle,$dupcontent,$authtype) {
+	function processDataInWP($get_details,$currentLimit,$user = null,$img,$duptitle,$dupcontent,$authtype) {      
 		require_once(ABSPATH . "wp-includes/pluggable.php");
 		require_once( ABSPATH . 'wp-admin/includes/image.php' );
 		$postmeta_terms =  $to_post = $post_data = $post_arr = $ex_type =  array(); 
 		$cur_prev_ids = $tag_name = $img_url =  $local_parent_id = $post_exist = $post_id = $type =  $img_url = $zip_img_url = $guid = '';
 		$sample = array('is_normal_post','is_custom_post','is_sticky','terms','postmeta','comments','is_page','post_id','attachment_url','guid','post_parent');
 		$un_comments = array('comment_user_id','comment_id','commentmeta');
-
 		if(is_array($get_details['posts'])) { 
 			$post_arr = $get_details['posts'];
 			$post_data = $post_arr[$currentLimit];
@@ -712,7 +718,7 @@ class WPAdvImporter_includes_helper {
 					if(($duptitle == 'true') || ($dupcontent == 'true') ) {
 						$type = 'title';
 						$post_exist =  $this->duplicateChecks($type,$post_data['post_title'],$post_data['post_type']);
-						if($post_exist != 0 ) {
+						if($post_exist != 1 ) {
 							$this->detailedLog[$currentLimit]['verify_here'] = "<b>".$post_data['post_title']." </b> is already exist<br>";
 							return false;
 						}
@@ -721,7 +727,7 @@ class WPAdvImporter_includes_helper {
 
 					if($post_val == 'attachment') {
 						if($img == 'no') {
-							$img_url    = $post_data['attachment_url'];
+							$img_url    = $post_data['attachment_url'];              
 							$zip_img_url= $this->get_img_from_zip($img_url);
 							$guid       = $this->get_attachment($zip_img_url , $currentLimit);
 						} 
@@ -739,6 +745,7 @@ class WPAdvImporter_includes_helper {
 								'post_content'   => '',
 								'post_status'    => 'inherit'
 								);
+// print_r($filename);  echo($parent_post_id);
 						$attach_id = wp_insert_attachment( $attachment, $filename, $parent_post_id );
 						$attach_data = wp_generate_attachment_metadata($attach_id, $filename);
 						wp_update_attachment_metadata( $attach_id, $attach_data );
@@ -883,7 +890,7 @@ class WPAdvImporter_includes_helper {
 	 *@param return post_group
 	 **/
 	public function get_post_details($all_arr) {
-		$normal_post_group = ''; 
+		$normal_post_group = array(); 
 		foreach($all_arr['posts'] as $key){
 			if( isset($key['is_normal_post'])  && ($key['post_type'] == 'post') ){
 				$is_noraml_post_title[]=$key['post_title'];
@@ -899,8 +906,8 @@ class WPAdvImporter_includes_helper {
 	 *@param return page_group
 	 **/
 	public function get_page_details($all_arr) {
-		$normal_page_group = '';
-		foreach($all_arr['posts'] as $key){
+		$normal_page_group =array();
+                        foreach($all_arr['posts'] as $key){
 			if( isset($key['is_page']) && ($key['post_type'] == 'page' )){
 				$is_page_title[]=$key['post_title'];
 				$is_page_id[]=$key['post_id'];
@@ -915,8 +922,8 @@ class WPAdvImporter_includes_helper {
 	 *@param return author_group
 	 **/
 	public function get_author_details($all_arr) {
-		$authors_name = '';
-		foreach($all_arr['authors'] as $value){
+		$authors_name = array();
+                        foreach($all_arr['authors'] as $value){
 			$authors_array[]=$value;
 			$authors_name[]=$value['author_login'];
 		}
@@ -928,8 +935,8 @@ class WPAdvImporter_includes_helper {
 	 *@param return custom_post group
 	 **/
 	public function get_custom_details($all_arr) {
-		$custom_post = '';
-		foreach($all_arr['posts'] as $key){
+		$custom_post = array();
+                        foreach($all_arr['posts'] as $key){
 			if( isset($key['is_custom_post']) && ($key['post_type'] != 'post' ) && ($key['post_type'] != 'page')) {
 				$custom_post_type[]=$key['post_type'];
 				$custom_post[]=$key;

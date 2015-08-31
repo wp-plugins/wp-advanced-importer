@@ -1,9 +1,9 @@
 jQuery(document).ready( function() {
 		document.getElementById('log').innerHTML = '<p style="margin:15px;color:red;">NO LOGS YET NOW.</p>';
-		var current_module =  document.getElementById('current_step').value;
-		if(current_module == 'content_mapping') {
-		content_mapping('all');
-		}
+      //		var current_module =  document.getElementById('current_step').value;
+     //		if(current_module == 'content_mapping') {
+    // 		content_mapping('all');
+   //	}
 
 		});
 
@@ -49,24 +49,25 @@ function debugoption() {
 
 
 function user_mapping() {
+
 	var simple_user = document.getElementById('simple').checked;
 	var adv_user    = document.getElementById('adv').checked;
 	var siteuser    = document.getElementById('siteuser').checked;
 	var xmluser    = document.getElementById('xmluser').checked;
 	var emailuser    = document.getElementById('emailuser').checked;
-	if(simple_user == true) {
+	if(simple_user == true) {               
 		var user = 'impall';
 		var type = 'simple';
 	}
-	else if(adv_user == true) {
+	else if(adv_user == true) { 
 		if(siteuser == true) {
 			var user_val = document.getElementById('site_user').value;
 			if(user_val == 'select') {
 				showMapMessages('error','Kindly select user from the list');
 				return false;
 			}
-			else {
-				var user = user_val;
+			else {    
+				var user = user_val;   
 			}
 		}
 		else if(xmluser == true) {
@@ -93,7 +94,7 @@ function user_mapping() {
 		}
 
 
-	} 
+	}
 }
 function media_check() {
 	var url = document.getElementById('ex_attachment').checked;
@@ -122,30 +123,67 @@ function check_allnumeric(inputtxt) {
 }
 
 
-function content_mapping(id)  {
-
-	document.getElementById('module').value = content_mapping;
-	if(id == 'all') {
-		if(document.getElementById('posts').checked == true)
+function content_mapping(id)  {    
+   //	document.getElementById('module').value = content_mapping;  
+/*	if(id) {                                                            
+		if(document.getElementById('posts').checked == true)   
+		{
 			document.getElementById('posts').checked = false;
-		else 
+		}
+		else
+		{ 
 			document.getElementById('posts').checked = true;
+		}	
 		if(document.getElementById('pages').checked == true)
+		{
 			document.getElementById('pages').checked = false;
+		}
 		else
+		{
 			document.getElementById('pages').checked = true;
+		}
 		if(document.getElementById('customposts').checked == true)
+		{
 			document.getElementById('customposts').checked = false;
+		}
 		else
+		{
 			document.getElementById('customposts').checked = true;	
-	}
+		}
+	}  
+
+	if(document.getElementById('posts').checked == true)   
+                {
+                        document.getElementById('pages').checked = false;
+                        document.getElementById('customposts').checked = false;
+                }
+ if(document.getElementById('pages').checked == true)
+		 {
+                        document.getElementById('posts').checked = false;
+			document.getElementById('customposts').checked = false;
+                }
+if(document.getElementById('customposts').checked == true)
+		{
+			document.getElementById('pages').checked = false;
+			 document.getElementById('posts').checked = false;
+		}  */
+
+
+
+
+
+
+
+
+
+/*
 	if(jQuery('#posts').prop('checked')) {
 		var posts =  document.getElementById('posts').value; 
 	} else { 
-		var posts = 'NULL'; 
+	var posts = 'NULL'; 
 	}
 	if(jQuery('#pages').prop('checked')) {
-		var pages = document.getElementById('pages').value;
+		var pages = document.getElementById('pages').value;   alert(pages);
 	} else { 
 		var pages = 'NULL'; 
 	}
@@ -154,9 +192,36 @@ function content_mapping(id)  {
 		var custom = document.getElementById('customposts').value;
 	} else { 
 		var custom = 'NULL'; 
-	}
+	}*/
+ if(document.getElementById('pages').checked == true)
+{ var pages = document.getElementById('pages').value;
 
-	var postdata = new Array( {'post':posts,'page':pages,'custom':custom } );
+}
+else
+{
+var pages='NULL';
+}
+ if(document.getElementById('posts').checked == true)   
+                {
+                        var posts =  document.getElementById('posts').value; 
+	
+                } 
+else
+{
+var posts = 'NULL';
+}
+
+if(document.getElementById('customposts').checked == true)
+{
+                var custom = document.getElementById('customposts').value;
+}
+else
+{
+var custom = 'NULL';
+}
+
+
+	var postdata = new Array( {'post':posts,'page':pages,'custom':custom } );   
 	jQuery.ajax({
         	type: 'POST',
         	url: ajaxurl,
@@ -168,6 +233,8 @@ function content_mapping(id)  {
        			var i = '';
        			var data = JSON.parse(data); 
        			var len = data.length;
+document.getElementById('edit_mapping').innerHTML ='';
+document.getElementById('edit_mapping').innerHTML = '<option value = "select"> -- select -- </option>';
        			for(i = 0; i<len; i++) {
        				if( (data[i] != 'attachment') ) {
        					document.getElementById('edit_mapping').innerHTML += '<option value = '+data[i]+'>'+data[i]+'</option>';
@@ -334,7 +401,7 @@ function show_user(val) {
 
 function importRecordsbySettings() {
 	var get_file = document.getElementById('file_name').value;
-	var get_log = document.getElementById('log').innerHTML;
+	var get_log = document.getElementById('log').innerHTML;                    
 	var postcount = document.getElementById('post_cnt').value;
 	var authorcount = document.getElementById('auth_cnt').value;
 	var total = parseInt(postcount) + 1;
@@ -350,7 +417,7 @@ function importRecordsbySettings() {
 	if(get_log == '<p style="margin:15px;color:red;">NO LOGS YET NOW.</p>'){
 		document.getElementById('log').innerHTML = '<p style="margin:15px;color:red;">Your Import Is In Progress...</p>';
 	}
-	document.getElementById('ajaxloader').style.display="";
+	document.getElementById('ajaxloader').style.display="";   
 	var tempCount = parseInt(tmpCnt);
 	var totalCount = parseInt(total);
 	if(tempCount>totalCount){
@@ -381,7 +448,8 @@ function importRecordsbySettings() {
 			else if(parseInt(tmpCnt) == parseInt(total) ){
 				document.getElementById('importtype').disabled= true;
 				document.getElementById('ajaxloader').style.display="none";
-				document.getElementById('log').innerHTML += "<br/>"+"<p style = 'color:green'> Your Import has been Completed . </p>";
+				var txt = document.getElementById('log').innerHTML += "<br/>"+"<p style = 'color:green'> Your Import has been Completed . </p>";
+                          document.getElementById('log').innerHTML= txt.replace("Your Import Is In Progress...","Your Import has been completed.");
 				return false;
 			}
 			document.getElementById('authcnt').value = 0 ;

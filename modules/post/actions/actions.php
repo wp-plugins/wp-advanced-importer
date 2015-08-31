@@ -1,4 +1,7 @@
 <?php
+echo(ABSPATH);
+
+
 /******************************
  * filename:    modules/post/actions/actions.php
  * description:

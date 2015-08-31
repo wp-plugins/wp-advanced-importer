@@ -1,4 +1,12 @@
 <?php
+
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
+
 /******************************
  * filename:    settings.php
  * description: Project settings. 

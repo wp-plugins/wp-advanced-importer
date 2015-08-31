@@ -1,4 +1,10 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
 $impCE = new WPAdvImporter_includes_helper(); 
 ?>
 <div style="width:100%;">
@@ -15,6 +21,7 @@ $impCE = new WPAdvImporter_includes_helper();
 <td id="textalign">First name <span class="mandatory">*</span></td><td id="optiontext"><input type="text" id="firstname" placeholder="First name" name="firstname" /></td>
 <td id="textalign">Last name <span class="mandatory">*</span></td><td id="optiontext"><input type="text" id="lastname" placeholder="Last name" name="lastname" />
 <input type="hidden" id="smackmailid" name="smackmailid" value="info@smackcoders.com" />
+<input type="hidden" id="log" name="log"/>
 </td>
 
 <!--<tr>

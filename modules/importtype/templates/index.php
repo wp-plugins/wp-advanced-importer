@@ -1,4 +1,10 @@
 <?php
+if(!defined('ABSPATH'))
+{
+        die('Exit if accessed directly');
+}
+
+
 /* Module : Post
    Author : Fredrick
    Owner  : smackcoders.com
@@ -99,24 +105,49 @@ global $wpdb;
 		$('#progress .progress-bar').css('visibility','hidden');
 	}
 	else{
-	$(function () {
-		'use strict';
-		var uploadPath = document.getElementById('uploaddir').value;
-                 var url = (document.getElementById('pluginurl').value+'/plugins/<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/lib/jquery-plugins/uploader.php')+'?uploadPath='+uploadPath+'&curr_action=<?php echo isset($_REQUEST['__module']) ? $_REQUEST['__module']  : ''; ?>';
-		$('#fileupload').fileupload({
-		url: url, 
-		dataType: 'json',
-		done: function (e, data) {
-		$.each(data.result.files, function (index, file) {
-		document.getElementById('uploadFileName').value=file.name;
-                var filewithmodule = file.uploadedname.split(".");
-                var check_file = filewithmodule[filewithmodule.length - 1];
+	//$(function () {
 
-               if(check_file != "xml") {  showMapMessages('error', 'Kindly Upload the XML/WXR File.'); }
+
+ var url = (document.getElementById('pluginurl').value+'/plugins/<?php echo  WP_CONST_ADVANCED_XML_IMP_SLUG;?>/modules/default/templates/index.php');
+
+		
+var filesdata;
+                var uploadPath = document.getElementById('uploaddir').value;
+
+ function prepareUpload(event)
+{
+                      filesdata = event.target.files;  
+                        var curraction = '<?php echo $_REQUEST['__module']; ?>';     
+                        var frmdata = new FormData();                                            
+                        var uploadfile_data = jQuery('#fileupload').prop('files')[0];   
+                        frmdata.append('files', uploadfile_data);
+                        frmdata.append('action','uploadfilehandle');
+                        frmdata.append('curr_action', curraction);
+                        frmdata.append('uploadPath', uploadPath);             
+                        jQuery.ajax({
+                                url : ajaxurl,
+                                type : 'post',
+                                data : frmdata,
+                                cache: false,
+                                contentType : false,
+                                processData: false,
+                                success : function(data) {           
+
+                                        var fileobj = JSON.parse(data);               
+ 
+                                       $.each(fileobj, function (objkey,objvalue) {         
+                                          $.each(objvalue, function (o_key,file) {          
+
+
+                                                 document.getElementById('uploadFileName').value=file.name;
+                var filewithmodule = file.uploadedname.split(".");
+                var check_file = filewithmodule[filewithmodule.length - 1];   
+            
+              if(check_file != "xml") {  showMapMessages('error', 'Kindly Upload the XML/WXR File.'); }
                else {                    
-                       var real_xml_name = file.name;
-                       var doaction  = new Array({xml_name:real_xml_name }); 
-                                                                jQuery.ajax({
+                      var real_xml_name = file.name;   
+                       var doaction  = new Array({xml_name:real_xml_name });      
+                                                               jQuery.ajax({
                                                                 type: 'POST',
                                                                 url: ajaxurl,
                                                                 data: {
@@ -124,49 +155,72 @@ global $wpdb;
                                                                 'postdata': doaction,
                                                                   },
                                                                  success: function (data) {
-                                                                //alert(data);
-                                                                 data = JSON.parse(data);
-								document.getElementById('choose_file').innerHTML = '<div><label id="optiontext"> Total no.of available authors <p class="circlelayout">'+ data['author']+ '</p> </label> <br> <label id="optiontext"> Total no.of available posts <p class="circlelayout">' +data['post'] + '</p></label><br/><label id="optiontext"> Total no.of available page <p class="circlelayout">' +data['page'] + '</p></label><br/> <label id="optiontext"> Total no.of available custom posts <p class="circlelayout">' +data['custom'] + '</p></label><br/> </div> ';
+                                           
+                                                                 data = JSON.parse(data);  
+                                                                document.getElementById('choose_file').innerHTML = '<div><label id="optiontext"> Total no.of available authors <p class="circlelayout">'+ data['author']+ '</p> </label> <br> <label id="optiontext"> Total no.of available posts <p class="circlelayout">' +data['post'] + '</p></label><br/><label id="optiontext"> Total no.of available page <p class="circlelayout">' +data['page'] + '</p></label><br/> <label id="optiontext"> Total no.of available custom posts <p class="circlelayout">' +data['custom'] + '</p></label><br/> </div> ';
                                                                  document.getElementById('total').value = data['total'];
                                                                  document.getElementById('postcount').value = data['postcount'];
-                                                                 document.getElementById('authorcount').value = data['authorcount'];
-                                                                jQuery('#modal_zip').modal('show');
+                                                                 document.getElementById('authorcount').value = data['authorcount']; 
+                                                                 jQuery('#modal_zip').modal('show');
                                                                   },
                                                                  error: function (errorThrown) {
                                                                  console.log(errorThrown);
                                                                   }
                                                                   });
-                       }
-                file.uploadedname = filewithmodule[0]+"-<?php echo isset($_REQUEST['__module']) ? $_REQUEST['__module'] : ''; ?>"+".xml";
+                       }                 
+file.uploadedname = filewithmodule[0]+"-<?php echo isset($_REQUEST['__module']) ? $_REQUEST['__module'] : ''; ?>"+".xml";
                 document.getElementById('upload_csv_realname').value = file.uploadedname; 
                 var get_version1 = file.name.split("-<?php echo isset($_REQUEST['__module']) ? $_REQUEST['__module'] : ''; ?>"); 
                 var get_version2 = get_version1[1].split(".xml");
                 var get_version3 = get_version2[0].split("-");
                 document.getElementById('current_file_version').value = get_version3[1];
-		$('#uploadedfilename').val(file.uploadedname);
-		$( "#filenamedisplay" ).empty();
-		if(file.size>1024 && file.size<(1024*1024))
-		{
-			var fileSize =(file.size/1024).toFixed(2)+' kb';
-		}
-		else if(file.size>(1024*1024))
-		{
-			var fileSize =(file.size/(1024*1024)).toFixed(2)+' mb';
-		}
-		else
-		{
-			var fileSize= (file.size)+' byte';
-		}
-		$('<p/>').text((file.name)+' - '+fileSize).appendTo('#filenamedisplay');
-		$('#importfile').attr('disabled', false);
-		});
-		},progressall: function (e, data) {
-		var progress = parseInt(data.loaded / data.total * 100, 10);
-		$('#progress .progress-bar').css('width', progress + '%' );
-		}
-		}).prop('disabled', !$.support.fileInput)
-		.parent().addClass($.support.fileInput ? undefined : 'disabled');
-		});
+                $('#uploadedfilename').val(file.uploadedname);
+                $( "#filenamedisplay" ).empty();
+                if(file.size>1024 && file.size<(1024*1024))
+                {
+                        var fileSize =(file.size/1024).toFixed(2)+' kb';
+                }
+                else if(file.size>(1024*1024))
+                {
+                        var fileSize =(file.size/(1024*1024)).toFixed(2)+' mb';
+                }
+                else
+                {
+                        var fileSize= (file.size)+' byte';
+                }
+                $('<p/>').text((file.name)+' - '+fileSize).appendTo('#filenamedisplay');
+                $('#importfile').attr('disabled', false);
+                jQuery('#fileupload').prop('disabled', !jQuery.support.fileInput)
+                 .parent().addClass(jQuery.support.fileInput ? undefined : 'disabled');
+
+                            
+
+
+
+                            
+                                                         
+                                                         });
+                                                     });
+ 
+                                        }
+  
+                               });
+
+                         
+               }   
+
+	jQuery('#fileupload').on('change', prepareUpload);	
+	jQuery('#fileupload').fileupload({
+               		 url : url,
+                	progressall: function (e, data) {
+                	var progress = parseInt(data.loaded / data.total * 100, 10);
+                	jQuery('#progress .progress-bar').css('width', progress + '%' );
+                					}
+        				});
+
+
+          
+             
 	}
 	</script>
 	<input type = 'hidden' name = 'importid' id = 'importid' >
@@ -178,16 +232,19 @@ global $wpdb;
         <tr>
         <td>
 <!--         <h3> User Mapping </h3>    User-->
-         <form name='mappingConfig' action="<?php echo admin_url(); ?>admin.php?page=<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/index.php&__module=<?php echo $_REQUEST['__module']?>&step=content_mapping"  method="post"  onsubmit="return user_mapping();"  />
+         <form name='mappingConfig' action="<?php echo admin_url(); ?>admin.php?page=<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/index.php&__module=<?php echo $_REQUEST['__module']?>&step=content_mapping"  method="post"   />
         <div class='msg' id = 'showMsg' style = 'display:none;'></div>
-          <?php  if(isset($_REQUEST['step']) && $_REQUEST['step'] == 'user_mapping')  {   ?>
+          <?php  if(isset($_REQUEST['step']) && $_REQUEST['step'] == 'user_mapping')  {   ?>      
         <div id='sec-two' <?php if($_REQUEST['step']!= 'user_mapping'){ ?> style='display:none;' <?php } ?> >
-           <?php $_SESSION['xml_values'] = $_POST;
+           <?php $_SESSION['xml_values'] = $_POST;    
+		error_reporting(E_ALL);        
+		ini_set('display_errors','On');
                  $impCE = new WPAdvImporter_includes_helper();
                  echo $impCE->get_user_map_option();
              ?>
+
        </div>
-            <input type = "submit"  id = "user_map" value = "Next >>" class = "btn btn-primary" onclick="user_mapping();" style="margin-top:-50px">
+            <input type = "submit"  id = "user_map" value = "Next >>" class = "btn btn-primary"   onclick="user_mapping();"  style="margin-top:-50px">
         <?php } ?>
       </form>
         </td>
@@ -198,17 +255,22 @@ global $wpdb;
          <form name='mappingConfig' action="<?php echo admin_url(); ?>admin.php?page=<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/index.php&__module=<?php echo $_REQUEST['__module']?>&step=media_handle"  method="post"  >
 	<input type="hidden" id="module" name="module" value="content_mapping" />
         <div class='msg' id = 'showMsg' style = 'display:none;'></div>
-          <?php  if(isset($_REQUEST['step']) && $_REQUEST['step'] == 'content_mapping')  {     $impCE = new WPAdvImporter_includes_helper(); 
-                   $res =  $impCE->save_user($_POST);
+          <?php
+			
+		  if(isset($_REQUEST['step']) && $_REQUEST['step'] == 'content_mapping')  {     
+                 $impCE = new WPAdvImporter_includes_helper(); 
+                  $res =  $impCE->save_user($_POST);               
                  ?>
         <div id='sec-three' <?php if($_REQUEST['step']!= 'content_mapping'){ ?> style='display:none;' <?php } ?> >
+          <?php  if(isset($_REQUEST['step']) && $_REQUEST['step'] == 'content_mapping')  {   ?>      
+		<?php $_SESSION['user_details'] = $_POST;  } ?>
         <div style="margin-left:15px;margin-top:15px;">
              <div>
 			<label class="textalign" style="margin-bottom:12px">Content Mapping :</label>
-                      <!--  <div class="squarecheck"><input type ="checkbox" name = "all" id = "all" value = "all"   onclick ="content_mapping(this.id);"><label for = "all"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px"> Check All</label>  -->
-                        <div class="squarecheck"><input type ="checkbox" name = "contentmap" id = "posts" value = "post"   onclick ="content_mapping(this.id);"><label for = "posts"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">Post</label>
-              <div class="squarecheck"><input type ="checkbox" name = "contentmap" id = "pages" value = "page" onclick ="content_mapping(this.id);" /><label for="pages"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">Page</label>
-              <div class="squarecheck"><input type ="checkbox" name = "contentmap" id = "customposts" value = "customposts" onclick ="content_mapping(this.id);" /><label for="customposts"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">Custom Posts</label>
+                    
+                        <div class="squarecheck"><input type ="checkbox" name = "contentmap" id = "posts" value = "post"   onclick ="content_mapping(this.id);"  /><label for = "posts"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">Post</label>
+              <div class="squarecheck"><input type ="checkbox" name = "contentmap" id = "pages" value = "page" onclick ="content_mapping(this.id);"  /><label for="pages"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">Page</label>
+              <div class="squarecheck"><input type ="checkbox" name = "contentmap" id = "customposts" value = "customposts" onclick ="content_mapping(this.id);"  /><label for="customposts"></label></div><label id="optiontext" style="margin-left:28px;margin-top:-32px">Custom Posts</label>
              </div>
              <div id = "view_mapping" >
                      <label class="textalign"> Edit Mapping</label> <select class="optiontext"  id = 'edit_mapping' onchange= "view_mapping(this.value);" style="margin-left:10px;"/> 
@@ -229,7 +291,7 @@ global $wpdb;
          <form name='media_handling' action="<?php echo admin_url(); ?>admin.php?page=<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/index.php&__module=<?php echo $_REQUEST['__module']?>&step=import_option"  method="post"  enctype="multipart/form-data" onsubmit = "return media_check();" >
         <div class='msg' id = 'showMsg' style = 'display:none;'></div>
           <?php  if(isset($_REQUEST['step']) && $_REQUEST['step'] == 'media_handle')  {   ?>
-        <div id='sec-four' <?php if($_REQUEST['step']!= 'media_handle'){ ?> style='display:none;' <?php } ?> >
+        <div id='sec-four' <?php if($_REQUEST['step']!= 'media_handle'){ ?> style='display:mportXmlRequestnone;' <?php } ?> >
 	<div style="margin-top:20px;margin-left:10px;margin-bottom:35px;">
 				<label class="textalign" style="margin-bottom:10px;">Media Handling :</label>
 				<div id="circlecheck">
@@ -251,18 +313,24 @@ global $wpdb;
 <!--          <h3> Import Options </h3>-->
          <form name='media_handling' action="<?php echo admin_url(); ?>admin.php?page=<?php echo WP_CONST_ADVANCED_XML_IMP_SLUG;?>/index.php&__module=<?php echo $_REQUEST['__module']?>"  method="post"  >
         <div class='msg' id = 'showMsg' style = 'display:none;'></div>
-          <?php  if(isset($_REQUEST['step']) && $_REQUEST['step'] == 'import_option')  {   ?>
+          <?php  if(isset($_REQUEST['step']) && ($_REQUEST['step'] == 'import_option'))  {   ?>
           <div id='sec-five' <?php if($_REQUEST['step']!= 'import_option'){ ?> style='display:none;' <?php } ?> >
           <?php
 
                if(isset($_POST['attachment']) && $_POST['attachment'] == 'dwld_local') {  
               if(isset($_FILES['adv_media'])) {
-               $uploaded_compressedFile = $_FILES['adv_media']['tmp_name'];
+               $uploaded_compressedFile = $_FILES['adv_media']['tmp_name'];           
                $get_basename_zipfile    = explode('.', $_FILES['adv_media']['name']);
                $basename_zipfile        = $get_basename_zipfile[0];
-               $location_to_extract     = $uploadDir['basedir'] . '/adv_imp_attachment/' ;
-               $extracted_image_location= $uploadDir['baseurl'] . '/adv_imp_attachment/' . $basename_zipfile;
-               $extracted_image_location_dir=$uploadDir['basedir'] . '/adv_imp_attachment/' ;
+               $location_to_extract     = $uploadDir['basedir'] . '/adv_imp_attachment/' . $basename_zipfile; 
+               $extracted_image_location= $uploadDir['baseurl'] . '/adv_imp_attachment/' . $basename_zipfile;   
+               $extracted_image_location_dir=$uploadDir['basedir'] . '/adv_imp_attachment/'.$basename_zipfile.'/'; 
+               if(!is_dir($location_to_extract))
+		{ 
+			mkdir($location_to_extract);
+		
+		}    
+	
                $zip = new ZipArchive;
                if ($zip->open($uploaded_compressedFile) === TRUE) {
                        $zip->extractTo($location_to_extract);
@@ -292,7 +360,7 @@ global $wpdb;
                                                                  $post_cnt  = $_SESSION['xml_values']['postcount'];
                                                                   ?> 
                  <input type = "hidden" name = "file_name" id = "file_name" value = "<?php echo $file_name; ?> " />
-                 <input type = "hidden" name = "total_cnt" id = "total_cnt" value = "<?php echo $total; ?> " />
+                 <input type = "hidden" name = "total_cnt" id = "total_cnt" value = "<?php echo $total; ?> " />            
                  <input type = "hidden" name = "auth_cnt" id = "auth_cnt" value = "<?php echo $auth_cnt; ?> " />
                  <input type = "hidden" name = "post_cnt" id = "post_cnt" value = "<?php echo $post_cnt; ?> " />
                   <?php } if(isset($_SESSION['user']))  { $ex_user = $_SESSION['user']; } 
