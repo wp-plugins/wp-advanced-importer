@@ -1049,7 +1049,6 @@ class UploadHandler
     }
 
     protected function handle_file_upload($uploaded_file, $name, $size, $type, $error,$index = null, $content_range = null) {
-             $post_url = admin_url() . 'admin.php?page=' .WP_CONST_ADVANCED_XML_IMP_SLUG. '/index.php&__module=' . $_POST['current_module'] . '&step=uploadfile';
 	//	if($post_url != $_SERVER['HTTP_REFERER'])
 	//		die('Your requested url were wrong! Please contact your admin.');
 /*	if($_SERVER['HTTP_REFERER'] != urldecode($_SERVER['HTTP_REFERER'])){
