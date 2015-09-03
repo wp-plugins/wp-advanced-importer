@@ -56,14 +56,14 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 == Changelog ==
 
 = 2.0.6 =
-* Remove unwanted warning messages
-* Email Opt Out Checkbox value not submitted to zohocrm lead was fixed
-* Change UI  design same as lead builder pro
-* Remove form builder from menu and that sets under manage shortcode's edit link
-* Set links for upgrade to pro
-* Add bulk Actions dropdown(enable field,disable field,update order) in form builder page
-* Display CRM Type,Module Type and Shortcode in form builder page.
-* Remove Form Type drop down from Form Options.
+* Fixed: ../../../../wp-load.php is removed and wordpress ajax call is used.
+* Fixed : Removed the wp-content that are directly used in some files.
+* Added: Checked the ABSPATH in each file.
+* Fixed: Upload media zip option problem is fixed.
+* Fixed: Featured image issue is fixed.
+* Fixed: All warnings are fixed.
+* Fixed: All minor bugs are fixed.
+* Fixed: All typeErrors are fixed.
 
 = 2.0.5 =
 * Fixed: Reported forum bugs.
