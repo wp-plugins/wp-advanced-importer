@@ -4,8 +4,8 @@ Donate link: http://www.smackcoders.com/donate.html
 Tags: batch, import, plugin, admin, xml, importer, data, migration, backup, restore
 Requires at least: 4.2
 Tested up to: 4.3
-Stable tag: 2.0.6
-Version: 2.0.6
+Stable tag: 2.0.7
+Version: 2.0.7
 Author: smackcoders
 Author URI: http://profiles.wordpress.org/smackcoders/
 License: GPLv2 or later
@@ -41,11 +41,11 @@ For guides and tutorials, visit http://www.smackcoders.com .
 
 == Screenshots ==
 
-1.Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc.
-2.Advanced user mapping allows to assign any desired user or create new user.
-3.Advanced content mapping, user can selectively import their posts attributes and edit mapping.
-4.Advanced Media Handling with url and zip upload.
-5.Advanced duplicate post name and content check with server request control for high performance factor.
+1. Wp Advanced Importer With Ultimate User Friendly Features with drag and drop etc.
+2. Advanced user mapping allows to assign any desired user or create new user.
+3. Advanced content mapping, user can selectively import their posts attributes and edit mapping.
+4. Advanced Media Handling with url and zip upload.
+5. Advanced duplicate post name and content check with server request control for high performance factor.
 
 == Frequently Asked Questions ==
 
@@ -54,6 +54,9 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 
 
 == Changelog ==
+
+= 2.0.7 =
+* Fixed: apache_get_modules() problem is fixed.
 
 = 2.0.6 =
 * Fixed: ../../../../wp-load.php is removed and wordpress ajax call is used.
@@ -108,7 +111,10 @@ Like other plugins wp-advanced-importer is easy to install. Upload the wp-advanc
 
 == Upgrade Notice ==
 
-= 2.0.5 =
+= 2.0.7 =
+* Upgrade for apahe related issue fix
+
+= 2.0.6 =
 * Upgrade now for new issue fixes
 
 = 2.0.5 =

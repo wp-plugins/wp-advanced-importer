@@ -32,10 +32,11 @@ global $wpdb; global $wp_version;?>
                         </table>
                         <h3 id="innertitle" colspan="2" >Required Loaders and Extentions:</h3>
                         <table class="table table-striped">
-                        <?php $loaders_extensions = get_loaded_extensions();
-                              $mod_security = apache_get_modules();
-                       ?>
-                        <!--<tr><td>IonCube Loader </td><td><?php if(in_array('ionCube Loader', $loaders_extensions)) {
+                        <?php $loaders_extensions = get_loaded_extensions();?>
+                        <?php if(function_exists('apache_get_modules')){
+                                   $mod_security = apache_get_modules();
+                          }?>
+				<!--<tr><td>IonCube Loader </td><td><?php if(in_array('ionCube Loader', $loaders_extensions)) {
                                         echo '<label style="color:green;">Yes</label>';
                                 } else {
                                         echo '<label style="color:red;">No</label>';
