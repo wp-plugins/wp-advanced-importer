@@ -1,11 +1,4 @@
 <?php
-
-if(!defined('ABSPATH'))
-{
-        die('Exit if accessed directly');
-}
-
-
 /******************************
  * filename:    SkinnyController.php
  * description: The main application controller. Every request goes through here.
@@ -13,7 +6,7 @@ if(!defined('ABSPATH'))
 
 require_once('base/SkinnyBaseController.php');
 
-class SkinnyControllerWPAdvXMLFree extends SkinnyBaseControllerWPAdvXMLFree 
+class SkinnyControllerWPAdvImp extends SkinnyBaseControllerWPAdvImp 
 {
 
 	public function __construct()
@@ -92,14 +85,14 @@ class SkinnyControllerWPAdvXMLFree extends SkinnyBaseControllerWPAdvXMLFree
 
 } // class SkinnyController
 
-class CallWPAdvSkinnyObj extends SkinnyControllerWPAdvXMLFree
+class CallXmlSkinnyObj extends SkinnyControllerWPAdvImp
 {
 private static $_instance = null;
 public static function getInstance()
 {
 if( !is_object(self::$_instance) )  //or if( is_null(self::$_instance) ) or if( self::$_instance == null )
-self::$_instance = new SkinnyControllerWPAdvXMLFree();
+self::$_instance = new SkinnyControllerWPAdvImp();
 return self::$_instance;
 }
-}// CallWPAdvSkinnyObj Class Ends
+}// CallSkinnyObj Class Ends
 

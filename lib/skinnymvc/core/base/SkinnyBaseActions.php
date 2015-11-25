@@ -1,10 +1,4 @@
 <?php
-if(!defined('ABSPATH'))
-{
-        die('Exit if accessed directly');
-}
-
-
 /******************************
  * filename:    SkinnyBaseActions.php
  * description: main Actions class
@@ -102,9 +96,9 @@ class SkinnyBaseActions {
    * @return array
    */
    public function call($module='default', $action='index', $request=array('GET'=>array(), 'POST'=>array())) {
-      $moduleClass = SkinnyControllerWPCsvFree::camelize($module) . 'Actions';
+      $moduleClass = SkinnyControllerWPAdvImp::camelize($module) . 'Actions';
 
-      $actionMethod = 'execute'.SkinnyControllerWPCsvFree::camelize($action);
+      $actionMethod = 'execute'.SkinnyControllerWPAdvImp::camelize($action);
 
       $moduleObj = new $moduleClass();
 

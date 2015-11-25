@@ -1,16 +1,10 @@
 <?php
-
-if(!defined('ABSPATH'))
-{
-        die('Exit if accessed directly');
-}
-
 /******************************
  * filename:    SkinnyBaseController.php
  * description: The main application controller. Every request goes through here.
  */
 
-class SkinnyBaseControllerWPAdvXMLFree {
+class SkinnyBaseControllerWPAdvImp {
 
     protected static $layout = 'layout'; /* name of the layout file to use - no extension */
     protected $app = null;
@@ -151,10 +145,10 @@ class SkinnyBaseControllerWPAdvXMLFree {
         }
 
         //Initialize session
-        if (SkinnySettings::$CONFIG['session persistency']) {
+        /*if (SkinnySettings::$CONFIG['session persistency']) {
             $this->skinnyUser = SkinnyUser::getUser();
         }
-
+*/
         //Get all plugins
         $this->require_once_many(WP_XMLIMP_PLUGIN_BASE."plugins/skinnyPlugin*.php");
 

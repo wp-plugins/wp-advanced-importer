@@ -1,9 +1,4 @@
 <?php
-if(!defined('ABSPATH'))
-{
-        die('Exit if accessed directly');
-}
-
 /**
  * filename:    SkinnyBaseDbController.php
  * description: Database controller

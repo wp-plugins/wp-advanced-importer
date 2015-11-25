@@ -1,10 +1,4 @@
 <?php
-if(!defined('ABSPATH'))
-{
-        die('Exit if accessed directly');
-}
-
-
 /**
  * filename:    BaseModel.php
  * description: Base class for all Base model classes
